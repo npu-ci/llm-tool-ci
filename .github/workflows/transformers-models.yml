@@ -12,9 +12,9 @@ env:
 
 jobs:
   check_out_code:
-    runs-on: test
+    runs-on: ascend-910b
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -37,13 +37,13 @@ jobs:
           python shared_file_tool.py -f ./transformers.json --create
 
   scan_models:
-    runs-on: test
+    runs-on: ascend-910b
     needs: check_out_code
     strategy:
       matrix:
         model_type: [Llama2, Bert, BLOOM, GPT-2, OPT]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -92,10 +92,10 @@ jobs:
 
 
   update_table:
-    runs-on: test
+    runs-on: ascend-910b
     needs: scan_models
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi

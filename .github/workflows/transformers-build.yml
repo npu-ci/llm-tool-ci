@@ -1,29 +1,29 @@
 name: Transformers NPU Build
 run-name: Transformers NPU Build
 
-on: 
-  schedule:
-    - cron: '30 0 * * *'
+on: push
+  # schedule:
+  #   - cron: '30 0 * * *'
 
 env:
   HF_HOME: /root/models
 
 jobs:
   check_runner:
-    runs-on: test
+    runs-on: ascend-910b
     steps:
       - name: Check Runner Status
         run: echo "Done!"
 
 
   check_npu_environment:
-    runs-on: test
+    runs-on: ascend-910b
     needs: check_runner
     strategy:
       matrix:
         machine_type: [single-npu, multi-npu]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -51,10 +51,10 @@ jobs:
 
         
   install_transformers:
-    runs-on: test
+    runs-on: ascend-910b
     needs: check_npu_environment
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
