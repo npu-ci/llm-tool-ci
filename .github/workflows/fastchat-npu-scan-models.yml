@@ -1,0 +1,104 @@
+name: FastChat NPU Scan Models
+run-name: FastChat NPU Scan Models
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
+      tags:
+        description: 'Test scenario tags'
+        required: true
+        type: string
+
+
+jobs:
+  scan_models:
+    runs-on: ascend-910b
+    container:
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/projects/:/opt/projects/
+        - /data/disk3/action/models/hub/:/opt/big_models/
+        - /data/disk3/action/nlp_data/:/opt/nlp_data/
+        - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+        --device /dev/davinci_manager
+        --device /dev/devmm_svm
+        --device /dev/hisi_hdc
+        --device /dev/davinci6
+        --device /dev/davinci7
+    steps:
+      - name: Get FastChat Latest Code
+        uses: actions/checkout@v4
+        with:
+          repository: lm-sys/FastChat
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: FastChat
+          clean: true
+      - name: Get CI Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: hf-ci-demo
+      - name: Preprocess
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        run: |
+          python shared_file_tool.py -f ./transformers.json --create
+          cp fastchat_test/cases/scan_models/* /__w/hf-ci-demo/hf-ci-demo/FastChat/tests/
+          cp fastchat_test/fastchat-model-test-map.json /__w/hf-ci-demo/hf-ci-demo/FastChat/
+      - name: Run Scan Models
+        timeout-minutes: 120
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/FastChat
+        run: |
+          python tests/test_scan_models.py fastchat-model-test-map.json
+          echo 'scan models done.'
+          cp fastchat-models.json /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo/
+          echo 'fastchat-models.json copy done.'
+  update_readme:
+    runs-on: ascend-910b
+    needs: scan_models
+    container:
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+        --device /dev/davinci_manager
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: hf-ci-demo
+          clean: false
+      - name: Write Table to README
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        run: |
+          python update_table.py -f README.md -t fastchat-models.json -n fschat
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update FastChat Table
+          repository: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+          file_pattern: 'README.md'
