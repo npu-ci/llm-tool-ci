@@ -6,7 +6,7 @@
 
 |  | Transformers | Accelerate | PEFT | TRL |
 | :---: | :---: | :---: | :---: | :---: |
-| Support State | [![Transformers NPU Build](https://github.com/zhangsibo1129/hf-ci-demo/actions/workflows/transformers-npu-build.yml/badge.svg)](https://github.com/zhangsibo1129/hf-ci-demo/actions/workflows/transformers-npu-build.yml) <br> [![Transformers NPU Inference](https://github.com/zhangsibo1129/hf-ci-demo/actions/workflows/transformers-npu-inference.yml/badge.svg)](https://github.com/zhangsibo1129/hf-ci-demo/actions/workflows/transformers-npu-inference.yml) <br> [![Transformers NPU Training](https://github.com/zhangsibo1129/hf-ci-demo/actions/workflows/transformers-npu-training.yml/badge.svg)](https://github.com/zhangsibo1129/hf-ci-demo/actions/workflows/transformers-npu-training.yml) |  |  |  |
+| Support State | [![Transformers NPU Build](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml) <br> [![Transformers NPU Inference](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml) <br> [![Transformers NPU Training](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml) |  |  |  |
 | [Llama2]() |<!--transformers-Llama2--> |<!--accelerate-Llama2--> |<!--peft-Llama2--> |<!--trl-Llama2--> |
 | [Bert]() |<!--transformers-Bert--> |<!--accelerate-Bert--> |<!--peft-Bert--> |<!--trl-Bert--> |
 | [BLOOM]() |<!--transformers-BLOOM--> |<!--accelerate-BLOOM--> |<!--peft-BLOOM--> |<!--trl-BLOOM--> |
