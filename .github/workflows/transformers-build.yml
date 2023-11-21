@@ -2,12 +2,12 @@ name: Transformers NPU Build
 run-name: Transformers NPU Build
 
 on: 
-  push
+  push:
+    branches:
+        - main
+
   # schedule:
   #   - cron: '30 0 * * *'
-
-env:
-  HF_HOME: /root/models
 
 jobs:
   check_runner:
