@@ -1,0 +1,51 @@
+name: Transformers NPU Training
+run-name: Transformers NPU Training
+
+on:
+  workflow_run:
+    workflows: [Transformers NPU Inference]
+    types:
+      - completed
+
+env:
+  HF_HOME: /root/models
+
+jobs:
+  training_verification:
+    runs-on: test
+    strategy:
+      matrix:
+        machine_type: [single-npu, multi-npu]
+    container: 
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/models:/root/models
+        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+              --device /dev/davinci_manager
+              --device /dev/devmm_svm
+              --device /dev/hisi_hdc
+              --device /dev/davinci6
+              ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci7' || ''}}
+    steps:
+      - name: Trainer Verification (Single-NPU)
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/transformers
+        if: matrix.machine_type == 'single-npu' 
+        run: | 
+          python << EOF
+          if __name__ == '__main__':
+              from tests.trainer import test_trainer
+              trainer = test_trainer.get_regression_trainer(learning_rate=0.1)
+              trainer.train()
+          EOF
+      - name: Trainer Verification (Nulti-NPU)
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/transformers
+        if: matrix.machine_type == 'multi-npu' 
+        run: | 
+          pytest tests/trainer/test_trainer_distributed.py::TestTrainerDistributedNPU
+  
