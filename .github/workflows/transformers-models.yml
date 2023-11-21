@@ -1,0 +1,127 @@
+name: Transformers NPU Scan Models
+run-name: Transformers NPU Scan Models
+
+on:
+  workflow_run:
+    workflows: [Transformers NPU Training]
+    types:
+      - completed
+
+env:
+  HF_HOME: /root/models
+
+jobs:
+  check_out_code:
+    runs-on: test
+    container: 
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+
+    steps:
+      - name: Get Latest Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: hf-ci-demo
+
+      - name: Create Empty File
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        run: |
+          python shared_file_tool.py -f ./transformers.json --create
+
+  scan_models:
+    runs-on: test
+    needs: check_out_code
+    strategy:
+      matrix:
+        model_type: [Llama2, Bert, BLOOM, GPT-2, OPT]
+    container: 
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/models:/root/models
+        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+              --device /dev/davinci_manager
+              --device /dev/devmm_svm
+              --device /dev/hisi_hdc
+              --device /dev/davinci6
+              --device /dev/davinci7
+    steps: 
+      - name: Get Test File
+        id: test_file
+        uses: zoexx/github-action-json-file-properties@release
+        with:
+          file_path: "transformers-model-tests-map.json"
+          prop_path: ${{ matrix.model_type }}
+
+      - name: Scan Model
+        id: scan_model
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/transformers
+        continue-on-error: true
+        env:
+          TRANSFORMERS_TEST_BACKEND: torch_npu
+          TRANSFORMERS_TEST_DEVICE: npu:0  # must be "npu:x", not support "npu" for torch_npu currently
+        # "not beam_search": torch_npu does not support beam_search
+        # "not pipeline": self-hosted runer is unable to connect to HuggingFace Hub
+        run: |
+          pytest -k "not beam_search and not pipeline" ${{steps.test_file.outputs.value}}
+
+      - name: Write Result(True)
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        if: steps.scan_model.outcome == 'success' 
+        run: |
+          python shared_file_tool.py -f transformers.json -a ${{ matrix.model_type }}:true
+      
+      - name: Write Result(False)
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        if: steps.scan_model.outcome != 'success' 
+        run: |
+          python shared_file_tool.py -f transformers.json -a ${{ matrix.model_type }}:false
+
+
+  update_table:
+    runs-on: test
+    needs: scan_models
+    container: 
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/data:/root/data
+        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: hf-ci-demo
+          clean: false
+
+      - name: Write Table to README
+        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        run: |
+          python update_table.py -f README.md -t transformers.json -n transformers
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update Transformers Table
+          repository: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+          file_pattern: 'README.md'
