@@ -12,12 +12,12 @@ env:
 
 jobs:
   inference_verification:
-    runs-on: test
+    runs-on: ascend-910b
     strategy:
       matrix:
         machine_type: [single-npu, multi-npu]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi

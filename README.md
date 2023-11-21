@@ -38,7 +38,9 @@
     ```
 
 - 安装 CANN
+  
     [CANN Toolkit](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC702/Ascend-cann-toolkit_7.0.0.alpha002_linux-aarch64.run?response-content-type=application/octet-stream) 安装包下载
+    
     ```shell
     export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:$LD_LIBRARY_PATH
     chmod +x Ascend-cann-toolkit_7.0.0.alpha002_linux-aarch64.run
@@ -47,13 +49,16 @@
     ```
 
     [CANN Kernerls](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC702/Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run?response-content-type=application/octet-stream) 安装包下载
+    
     ```shell
     chmod +x Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run
     ./Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run --install
     ```
 
 - 安装 Torch
+    
     [Torch](https://download.pytorch.org/whl/cpu/torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl) 安装包下载
+    
     ```shell
     chmod +x torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
     pip install torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl -i https://pypi.tuna.tsinghua.edu.cn/simple
