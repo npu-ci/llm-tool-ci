@@ -33,10 +33,11 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/projects/:/opt/projects/
         - /data/disk3/action/models/hub/:/opt/big_models/
         - /data/disk3/action/nlp_data/:/opt/nlp_data/
         - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
+        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
       options: --network host
         --device /dev/davinci_manager
         --device /dev/devmm_svm
@@ -44,31 +45,20 @@ jobs:
         --device /dev/davinci6
         --device /dev/davinci7
     steps:
-      - name: Get FastChat Latest Code
-        uses: actions/checkout@v4
-        with:
-          repository: lm-sys/FastChat
-          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: FastChat
-          clean: true
-      - name: Get CI Code
-        uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: hf-ci-demo
+
       - name: Preprocess
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
           python shared_file_tool.py -f ./transformers.json --create
-          cp fastchat_test/cases/scan_models/* /__w/hf-ci-demo/hf-ci-demo/FastChat/tests/
-          cp fastchat_test/fastchat-model-test-map.json /__w/hf-ci-demo/hf-ci-demo/FastChat/
+          cp fastchat_test/cases/scan_models/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
+          cp fastchat_test/fastchat-model-test-map.json /__w/llm-tool-ci/llm-tool-ci/FastChat/
       - name: Run Scan Models
         timeout-minutes: 120
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/FastChat
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
         run: |
           python tests/test_scan_models.py fastchat-model-test-map.json
           echo 'scan models done.'
-          cp fastchat-models.json /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo/
+          cp fastchat-models.json /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
           echo 'fastchat-models.json copy done.'
   update_readme:
     runs-on: ascend-910b
@@ -89,10 +79,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: hf-ci-demo
+          path: llm-tool-ci
           clean: false
       - name: Write Table to README
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
           python update_table.py -f README.md -t fastchat-models.json -n fschat
 
@@ -100,5 +90,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update FastChat Table
-          repository: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+          repository: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           file_pattern: 'README.md'

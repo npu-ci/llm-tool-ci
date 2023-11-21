@@ -18,10 +18,11 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/projects/:/opt/projects/
         - /data/disk3/action/models/hub/:/opt/big_models/
         - /data/disk3/action/nlp_data/:/opt/nlp_data/
         - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
+        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
@@ -29,27 +30,14 @@ jobs:
                --device /dev/davinci6
                --device /dev/davinci7
     steps:
-        - name: Get FastChat Latest Code
-          uses: actions/checkout@v4
-          with:
-            repository: lm-sys/FastChat
-            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-            path: FastChat
-            clean: true
-        - name: Get CI Code
-          uses: actions/checkout@v4
-          with:
-            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-            path: hf-ci-demo
-
         - name: Copy_Test_Cases
-          working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           run: |
-            cp fastchat_test/cases/fine_tune/* /__w/hf-ci-demo/hf-ci-demo/FastChat/tests/
+            cp fastchat_test/cases/fine_tune/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
 
         - name: run_fine_tune_cases
           timeout-minutes: 60
-          working-directory: /__w/hf-ci-demo/hf-ci-demo/FastChat
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
           run: |
             python tests/test_fine_tune.py > fine_tune.log
             sleep 1000
