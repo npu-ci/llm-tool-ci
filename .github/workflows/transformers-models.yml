@@ -20,7 +20,7 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
       options: --network host
 
@@ -29,10 +29,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: hf-ci-demo
+          path: llm-tool-ci
 
       - name: Create Empty File
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
           python shared_file_tool.py -f ./transformers.json --create
 
@@ -49,7 +49,7 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/models:/root/models
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
       options: --network host
@@ -68,7 +68,7 @@ jobs:
 
       - name: Scan Model
         id: scan_model
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/transformers
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/transformers
         continue-on-error: true
         env:
           TRANSFORMERS_TEST_BACKEND: torch_npu
@@ -79,13 +79,13 @@ jobs:
           pytest -k "not beam_search and not pipeline" ${{steps.test_file.outputs.value}}
 
       - name: Write Result(True)
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         if: steps.scan_model.outcome == 'success' 
         run: |
           python shared_file_tool.py -f transformers.json -a ${{ matrix.model_type }}:true
       
       - name: Write Result(False)
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         if: steps.scan_model.outcome != 'success' 
         run: |
           python shared_file_tool.py -f transformers.json -a ${{ matrix.model_type }}:false
@@ -102,7 +102,7 @@ jobs:
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/data:/root/data
-        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
       options: --network host
 
@@ -111,11 +111,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: hf-ci-demo
+          path: llm-tool-ci
           clean: false
 
       - name: Write Table to README
-        working-directory: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
           python update_table.py -f README.md -t transformers.json -n transformers
 
@@ -123,5 +123,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update Transformers Table
-          repository: /__w/hf-ci-demo/hf-ci-demo/hf-ci-demo
+          repository: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           file_pattern: 'README.md'
