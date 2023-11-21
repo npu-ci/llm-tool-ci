@@ -61,7 +61,7 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/hf-ci-demo/hf-ci-demo
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/data:/root/data
       options: --network host
                --device /dev/davinci_manager
@@ -77,7 +77,7 @@ jobs:
             path: transformers
             clean: true
         - name: Install Transformers
-          working-directory: /__w/hf-ci-demo/hf-ci-demo/transformers
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/transformers
           run: |
             pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install -e .[dev-torch] -i https://pypi.tuna.tsinghua.edu.cn/simple
