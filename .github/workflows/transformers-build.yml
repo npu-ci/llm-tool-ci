@@ -2,8 +2,7 @@ name: Transformers NPU Build
 run-name: Transformers NPU Build
 
 on: 
-  push:
-    branches: [test]
+  push
   # schedule:
   #   - cron: '30 0 * * *'
 
