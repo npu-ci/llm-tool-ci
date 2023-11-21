@@ -1,0 +1,7 @@
+{
+    "Llama2": "tests/models/llama/test_modeling_llama.py",
+    "Bert": "tests/models/bert/test_modeling_bert.py",
+    "BLOOM": "tests/models/bloom/test_modeling_bloom.py",
+    "GPT-2": "tests/models/gpt2/test_modeling_gpt2.py",
+    "OPT": "tests/models/opt/test_modeling_opt.py"
+}
