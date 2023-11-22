@@ -8,10 +8,10 @@
 | :---: | :---: | :---: | :---: | :---: |
 | Support State | [![Transformers NPU Build](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml) <br> [![Transformers NPU Inference](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml) <br> [![Transformers NPU Training](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml) |  |  |  |
 | [Llama2]() |<!--transformers-Llama2--> |<!--accelerate-Llama2--> |<!--peft-Llama2--> |<!--trl-Llama2--> |
-| [Bert]() |<!--transformers-Bert--> |<!--accelerate-Bert--> |<!--peft-Bert--> |<!--trl-Bert--> |
+| [Bert]() |<!--transformers-Bert-->✅|<!--accelerate-Bert--> |<!--peft-Bert--> |<!--trl-Bert--> |
 | [BLOOM]() |<!--transformers-BLOOM--> |<!--accelerate-BLOOM--> |<!--peft-BLOOM--> |<!--trl-BLOOM--> |
 | [GPT-2]() |<!--transformers-GPT-2--> |<!--accelerate-GPT-2--> |<!--peft-GPT-2--> |<!--trl-GPT-2--> |
-| [OPT]() |<!--transformers-OPT--> |<!--accelerate-OPT--> |<!--peft-OPT--> |<!--trl-OPT--> |
+| [OPT]() |<!--transformers-OPT-->✅|<!--accelerate-OPT--> |<!--peft-OPT--> |<!--trl-OPT--> |
 | Others |  |  |  |  |
 
 ##### 基础环境

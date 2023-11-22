@@ -34,7 +34,7 @@ jobs:
       - name: Create Empty File
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
-          python shared_file_tool.py -f ./transformers.json --create
+          python file_tool.py -f ./transformers.json --create
 
   scan_models:
     runs-on: ascend-910b
@@ -82,13 +82,13 @@ jobs:
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         if: steps.scan_model.outcome == 'success' 
         run: |
-          python shared_file_tool.py -f transformers.json -a ${{ matrix.model_type }}:true
+          python file_tool.py -f transformers.json -a ${{ matrix.model_type }}:true
       
       - name: Write Result(False)
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         if: steps.scan_model.outcome != 'success' 
         run: |
-          python shared_file_tool.py -f transformers.json -a ${{ matrix.model_type }}:false
+          python file_tool.py -f transformers.json -a ${{ matrix.model_type }}:false
 
 
   update_table:
