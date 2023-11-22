@@ -34,7 +34,7 @@ jobs:
       - name: Preprocess
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
-          python shared_file_tool.py -f ./transformers.json --create
+          python file_tool.py -f ./transformers.json --create
           cp fastchat_test/cases/scan_models/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
           cp fastchat_test/fastchat-model-test-map.json /__w/llm-tool-ci/llm-tool-ci/FastChat/
       - name: Run Scan Models
