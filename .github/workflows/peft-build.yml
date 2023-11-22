@@ -1,11 +1,26 @@
-name: FastChat NPU Build
-run-name: FastChat NPU Build
+name: PEFT NPU Build
+run-name: PEFT NPU Build
 
 on:
-   schedule:
-     - cron: '30 0 * * *'
-   issue_comment:
-     types: [created]
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
+      tags:
+        description: 'Test scenario tags'
+        required: true
+        type: string
 
 jobs:
   check_runner:
@@ -20,7 +35,7 @@ jobs:
     strategy:
       matrix:
         machine_type: [single-npu, multi-npu]
-    container: 
+    container:
       image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
@@ -50,17 +65,16 @@ jobs:
   install_fastchat:
     runs-on: ascend-910b
     needs: check_npu_environment
-    container: 
+    container:
       image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/models/hub:/opt/big_models/
         - /data/disk3/action/envs/fschat:/root/data
         - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
+        - /data/disk3/action/projects/peft:/__w/llm-tool-ci/llm-tool-ci/peft
 
       options: --network host
                --device /dev/davinci_manager
@@ -68,32 +82,45 @@ jobs:
                --device /dev/hisi_hdc
                --device /dev/davinci6
     steps:
-        - name: Get FastChat Latest Code
+        - name: Get peft Latest Code
           uses: actions/checkout@v4
           with:
-            repository: lm-sys/FastChat
+            repository: huggingface/peft
             ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-            path: FastChat
+            path: peft
             clean: true
-        - name: Pull FastChat
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+        - name: Pull peft
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/peft
           run: |
             git pull
             pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install "fschat[model_worker,webui]" -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install SentencePiece xformers -i https://pypi.tuna.tsinghua.edu.cn/simple
+            pip install peft transformers accelerate pytest pytest-cov pytest-xdist parameterized datasets -i https://pypi.mirrors.ustc.edu.cn/simple
         - name: Get CI Code
           uses: actions/checkout@v4
           with:
             ssh-key: ${{ secrets.SECRET_SSH_KEY }}
             path: llm-tool-ci
         - name: Import Verification
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/peft
           run: |
             python << EOF
             if __name__ == '__main__':
-                from fastchat.conversation import SeparatorStyle
-                from fastchat.model.model_adapter import get_conversation_template
+                from peft import (
+                  AutoPeftModel,
+                  AutoPeftModelForCausalLM,
+                  AutoPeftModelForFeatureExtraction,
+                  AutoPeftModelForQuestionAnswering,
+                  AutoPeftModelForSeq2SeqLM,
+                  AutoPeftModelForSequenceClassification,
+                  AutoPeftModelForTokenClassification,
+                  PeftModel,
+                  PeftModelForCausalLM,
+                  PeftModelForFeatureExtraction,
+                  PeftModelForQuestionAnswering,
+                  PeftModelForSeq2SeqLM,
+                  PeftModelForSequenceClassification,
+                  PeftModelForTokenClassification,
+              )
             EOF
         - name: Persistent Python Interpreter
           run: |

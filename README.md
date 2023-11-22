@@ -4,14 +4,14 @@
 
 ##### Hugging Face 工具链及模型支持状态
 
-|  | Transformers | Accelerate | PEFT | TRL |
+|  | Transformers | Accelerate | PEFT | FastChat |
 | :---: | :---: | :---: | :---: | :---: |
-| Support State | [![Transformers NPU Build](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml) <br> [![Transformers NPU Inference](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml) <br> [![Transformers NPU Training](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml) |  |  |  |
-| [Llama2]() |<!--transformers-Llama2--> |<!--accelerate-Llama2--> |<!--peft-Llama2--> |<!--trl-Llama2--> |
-| [Bert]() |<!--transformers-Bert-->✅|<!--accelerate-Bert--> |<!--peft-Bert--> |<!--trl-Bert--> |
-| [BLOOM]() |<!--transformers-BLOOM--> |<!--accelerate-BLOOM--> |<!--peft-BLOOM--> |<!--trl-BLOOM--> |
-| [GPT-2]() |<!--transformers-GPT-2--> |<!--accelerate-GPT-2--> |<!--peft-GPT-2--> |<!--trl-GPT-2--> |
-| [OPT]() |<!--transformers-OPT-->✅|<!--accelerate-OPT--> |<!--peft-OPT--> |<!--trl-OPT--> |
+| Support State | [![Transformers NPU Build](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-build.yml) <br> [![Transformers NPU Inference](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-inference.yml) <br> [![Transformers NPU Training](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/transformers-training.yml) |  |  | [![FastChat NPU Build](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-build.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-build.yml) <br> [![FastChat NPU Deploy](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-deploy.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-deploy.yml) <br> [![FastChat NPU FineTune](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-finetune.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-finetune.yml) <br> [![FastChat NPU Inference](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-inference.yml/badge.svg)](https://github.com/npu-ci/llm-tool-ci/actions/workflows/fastchat-inference.yml) |
+| [Llama2]() |<!--transformers-Llama2--> |<!--accelerate-Llama2--> |<!--peft-Llama2--> |<!--fschat-Llama2--> |
+| [Bert]() |<!--transformers-Bert-->✅|<!--accelerate-Bert--> |<!--peft-Bert--> |<!--fschat-Bert--> |
+| [BLOOM]() |<!--transformers-BLOOM--> |<!--accelerate-BLOOM--> |<!--peft-BLOOM--> |<!--fschat-BLOOM--> |
+| [GPT-2]() |<!--transformers-GPT-2--> |<!--accelerate-GPT-2--> |<!--peft-GPT-2--> |<!--fschat-GPT-2--> |
+| [OPT]() |<!--transformers-OPT-->✅|<!--accelerate-OPT--> |<!--peft-OPT--> |<!--fschat-OPT--> |
 | Others |  |  |  |  |
 
 ##### 基础环境
