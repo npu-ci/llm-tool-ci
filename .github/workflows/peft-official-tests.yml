@@ -1,9 +1,9 @@
-name: FastChat NPU Inference
-run-name: FastChat NPU Inference
+name: PEFT Official Tests
+run-name: PEFT Official Tests
 
 on:
   workflow_run:
-    workflows: [FastChat NPU Deploy]
+    workflows: [PEFT NPU Build]
     types:
       - completed
 
@@ -18,9 +18,9 @@ jobs:
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub/:/opt/big_models/
-        - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
+        - /data/disk3/action/envs/peft/torch_npu:/root/miniconda/envs/torch_npu
         - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
+        - /data/disk3/action/projects/peft:/__w/llm-tool-ci/llm-tool-ci/peft
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
@@ -31,12 +31,12 @@ jobs:
         - name: Copy_Test_Cases
           working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           run: |
-            cp fastchat_test/cases/inference/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
+            cp peft_test/peft_npu_test.patch /__w/hf-ci-demo/hf-ci-demo/peft/
 
-        - name: run_inference_cases
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+        - name: run_official_cases
+          timeout-minutes: 20
+          working-directory: /__w/hf-ci-demo/hf-ci-demo/peft
           run: |
-            cp tests/*.txt .
-            python tests/test_cli.py
-
-
+            git apply -3 --whitespace=fix peft_npu_test.patch
+            make test
+            git reset --hard
