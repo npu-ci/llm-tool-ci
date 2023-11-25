@@ -1,0 +1,748 @@
+diff --git a/tests/test_adaption_prompt.py b/tests/test_adaption_prompt.py
+index 117c43a..a66fe77 100644
+--- a/tests/test_adaption_prompt.py
++++ b/tests/test_adaption_prompt.py
+@@ -260,7 +260,6 @@ class AdaptionPromptTester(TestCase, PeftCommonTester):
+         config = AdaptionPromptConfig(adapter_layers=2, adapter_len=4, task_type="CAUSAL_LM")
+         model = get_peft_model(model, config)
+         model = model.to(self.torch_device)
+-
+         input_ids = torch.LongTensor([[1, 1, 1], [2, 1, 2]]).to(self.torch_device)
+         attention_mask = torch.LongTensor([[1, 1, 1], [1, 0, 1]]).to(self.torch_device)
+ 
+@@ -413,7 +412,7 @@ class AdaptionPromptTester(TestCase, PeftCommonTester):
+         """Test that AdaptionPrompt works when Llama using a half-precision model."""
+         input_ids = torch.LongTensor([[1, 1, 1], [2, 1, 2]]).to(self.torch_device)
+         original = LlamaForCausalLM.from_pretrained(
+-            "trl-internal-testing/tiny-random-LlamaForCausalLM", torch_dtype=torch.bfloat16
++            "/opt/big_models/tiny-random-LlamaForCausalLM", torch_dtype=torch.bfloat16
+         )
+         adapted = get_peft_model(
+             original, AdaptionPromptConfig(adapter_layers=2, adapter_len=4, task_type="CAUSAL_LM")
+diff --git a/tests/test_auto.py b/tests/test_auto.py
+deleted file mode 100644
+index 24ace99..0000000
+--- a/tests/test_auto.py
++++ /dev/null
+@@ -1,192 +0,0 @@
+-# coding=utf-8
+-# Copyright 2023-present the HuggingFace Inc. team.
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#     http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
+-import tempfile
+-import unittest
+-
+-import torch
+-
+-from peft import (
+-    AutoPeftModel,
+-    AutoPeftModelForCausalLM,
+-    AutoPeftModelForFeatureExtraction,
+-    AutoPeftModelForQuestionAnswering,
+-    AutoPeftModelForSeq2SeqLM,
+-    AutoPeftModelForSequenceClassification,
+-    AutoPeftModelForTokenClassification,
+-    PeftModel,
+-    PeftModelForCausalLM,
+-    PeftModelForFeatureExtraction,
+-    PeftModelForQuestionAnswering,
+-    PeftModelForSeq2SeqLM,
+-    PeftModelForSequenceClassification,
+-    PeftModelForTokenClassification,
+-)
+-
+-
+-class PeftAutoModelTester(unittest.TestCase):
+-    def test_peft_causal_lm(self):
+-        model_id = "peft-internal-testing/tiny-OPTForCausalLM-lora"
+-        model = AutoPeftModelForCausalLM.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModelForCausalLM))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModelForCausalLM.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModelForCausalLM))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModelForCausalLM))
+-        self.assertTrue(model.base_model.lm_head.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModelForCausalLM.from_pretrained(model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16)
+-
+-    def test_peft_seq2seq_lm(self):
+-        model_id = "peft-internal-testing/tiny_T5ForSeq2SeqLM-lora"
+-        model = AutoPeftModelForSeq2SeqLM.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModelForSeq2SeqLM))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModelForSeq2SeqLM.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModelForSeq2SeqLM))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModelForSeq2SeqLM.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModelForSeq2SeqLM))
+-        self.assertTrue(model.base_model.lm_head.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModelForSeq2SeqLM.from_pretrained(model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16)
+-
+-    def test_peft_sequence_cls(self):
+-        model_id = "peft-internal-testing/tiny_OPTForSequenceClassification-lora"
+-        model = AutoPeftModelForSequenceClassification.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModelForSequenceClassification))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModelForSequenceClassification.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModelForSequenceClassification))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModelForSequenceClassification.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModelForSequenceClassification))
+-        self.assertTrue(model.score.original_module.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModelForSequenceClassification.from_pretrained(
+-            model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16
+-        )
+-
+-    def test_peft_token_classification(self):
+-        model_id = "peft-internal-testing/tiny_GPT2ForTokenClassification-lora"
+-        model = AutoPeftModelForTokenClassification.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModelForTokenClassification))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModelForTokenClassification.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModelForTokenClassification))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModelForTokenClassification.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModelForTokenClassification))
+-        self.assertTrue(model.base_model.classifier.original_module.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModelForTokenClassification.from_pretrained(
+-            model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16
+-        )
+-
+-    def test_peft_question_answering(self):
+-        model_id = "peft-internal-testing/tiny_OPTForQuestionAnswering-lora"
+-        model = AutoPeftModelForQuestionAnswering.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModelForQuestionAnswering))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModelForQuestionAnswering.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModelForQuestionAnswering))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModelForQuestionAnswering.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModelForQuestionAnswering))
+-        self.assertTrue(model.base_model.qa_outputs.original_module.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModelForQuestionAnswering.from_pretrained(
+-            model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16
+-        )
+-
+-    def test_peft_feature_extraction(self):
+-        model_id = "peft-internal-testing/tiny_OPTForFeatureExtraction-lora"
+-        model = AutoPeftModelForFeatureExtraction.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModelForFeatureExtraction))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModelForFeatureExtraction.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModelForFeatureExtraction))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModelForFeatureExtraction.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModelForFeatureExtraction))
+-        self.assertTrue(model.base_model.model.decoder.embed_tokens.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModelForFeatureExtraction.from_pretrained(
+-            model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16
+-        )
+-
+-    def test_peft_whisper(self):
+-        model_id = "peft-internal-testing/tiny_WhisperForConditionalGeneration-lora"
+-        model = AutoPeftModel.from_pretrained(model_id)
+-        self.assertTrue(isinstance(model, PeftModel))
+-
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            model.save_pretrained(tmp_dirname)
+-
+-            model = AutoPeftModel.from_pretrained(model_id)
+-            self.assertTrue(isinstance(model, PeftModel))
+-
+-        # check if kwargs are passed correctly
+-        model = AutoPeftModel.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+-        self.assertTrue(isinstance(model, PeftModel))
+-        self.assertTrue(model.base_model.model.model.encoder.embed_positions.weight.dtype == torch.bfloat16)
+-
+-        adapter_name = "default"
+-        is_trainable = False
+-        # This should work
+-        _ = AutoPeftModel.from_pretrained(model_id, adapter_name, is_trainable, torch_dtype=torch.bfloat16)
+diff --git a/tests/test_common_gpu.py b/tests/test_common_gpu.py
+index ae13ef1..e24d241 100644
+--- a/tests/test_common_gpu.py
++++ b/tests/test_common_gpu.py
+@@ -19,6 +19,8 @@ import unittest
+ import pytest
+ import torch
+ import torch.nn.functional as F
++
++from accelerate.utils import is_npu_available
+ from transformers import (
+     AutoModelForCausalLM,
+     AutoModelForSeq2SeqLM,
+@@ -55,18 +57,21 @@ if is_bnb_available():
+         from peft.tuners.lora import Linear4bit as LoraLinear4bit
+ 
+ 
+-@require_torch_gpu
+ class PeftGPUCommonTests(unittest.TestCase):
+     r"""
+     A common tester to run common operations that are performed on GPU such as generation, loading in 8bit, etc.
+     """
+ 
+     def setUp(self):
+-        self.seq2seq_model_id = "google/flan-t5-base"
+-        self.causal_lm_model_id = "facebook/opt-350m"
+-        self.audio_model_id = "openai/whisper-large"
++        self.seq2seq_model_id = "/opt/big_models/flan-t5-base"
++        self.causal_lm_model_id = "/opt/big_models/opt-350m"
++        self.audio_model_id = "/opt/big_models/whisper-large"
+         if torch.cuda.is_available():
+             self.device = torch.device("cuda:0")
++            self.device_str = 'cuda'
++        if is_npu_available:
++            self.device=torch.device("npu:0")
++            self.device_str = 'npu'
+ 
+     def tearDown(self):
+         r"""
+@@ -76,6 +81,8 @@ class PeftGPUCommonTests(unittest.TestCase):
+         gc.collect()
+         if torch.cuda.is_available():
+             torch.cuda.empty_cache()
++        if is_npu_available():
++            torch.npu.empty_cache()
+         gc.collect()
+ 
+     @require_bitsandbytes
+@@ -190,7 +197,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+         r"""
+         Test that tests if the 4bit quantization using LoRA works as expected with safetensors weights.
+         """
+-        model_id = "facebook/opt-350m"
++        model_id = "/opt/big_models/opt-350m"
+         peft_model_id = "ybelkada/test-st-lora"
+ 
+         model = AutoModelForCausalLM.from_pretrained(model_id, device_map="auto", load_in_4bit=True)
+@@ -300,7 +307,6 @@ class PeftGPUCommonTests(unittest.TestCase):
+         )
+ 
+     @pytest.mark.multi_gpu_tests
+-    @require_torch_multi_gpu
+     def test_lora_causal_lm_mutli_gpu_inference(self):
+         r"""
+         Test if LORA can be used for inference on multiple GPUs.
+@@ -408,7 +414,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+         EXPECTED_ALL_PARAMS = 125534208
+ 
+         model = AutoModelForCausalLM.from_pretrained(
+-            "facebook/opt-125m",
++            "/opt/big_models/opt-125m",
+             load_in_4bit=True,
+         )
+ 
+@@ -428,7 +434,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+         )
+ 
+         model = AutoModelForCausalLM.from_pretrained(
+-            "facebook/opt-125m",
++            "/opt/big_models/opt-125m",
+             quantization_config=bnb_config,
+         )
+ 
+@@ -484,7 +490,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+     def test_8bit_merge_lora(self):
+         torch.manual_seed(1000)
+         model = AutoModelForCausalLM.from_pretrained(
+-            "facebook/opt-125m",
++            "/opt/big_models/opt-125m",
+             load_in_8bit=True,
+         )
+         random_input = torch.LongTensor([[1, 0, 1, 0, 1, 0]]).to(model.device)
+@@ -521,7 +527,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+     def test_8bit_merge_and_disable_lora(self):
+         torch.manual_seed(1000)
+         model = AutoModelForCausalLM.from_pretrained(
+-            "facebook/opt-125m",
++            "/opt/big_models/opt-125m",
+             load_in_8bit=True,
+         )
+         random_input = torch.LongTensor([[1, 0, 1, 0, 1, 0]]).to(model.device)
+@@ -562,7 +568,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+             bnb_4bit_compute_type=torch.float32,
+         )
+         model = AutoModelForCausalLM.from_pretrained(
+-            "facebook/opt-125m",
++            "/opt/big_models/opt-125m",
+             quantization_config=bnb_config,
+             torch_dtype=torch.float32,
+         )
+@@ -604,7 +610,7 @@ class PeftGPUCommonTests(unittest.TestCase):
+             bnb_4bit_compute_type=torch.float32,
+         )
+         model = AutoModelForCausalLM.from_pretrained(
+-            "facebook/opt-125m",
++            "/opt/big_models/opt-125m",
+             quantization_config=bnb_config,
+             torch_dtype=torch.float32,
+         )
+@@ -635,14 +641,14 @@ class PeftGPUCommonTests(unittest.TestCase):
+         self.assertTrue(isinstance(model.base_model.model.model.decoder.layers[0].self_attn.q_proj, LoraLinear4bit))
+         self.assertTrue(isinstance(model.base_model.model.model.decoder.layers[0].self_attn.v_proj, LoraLinear4bit))
+ 
+-    @require_torch_gpu
+-    @pytest.mark.single_gpu_tests
++    @pytest.mark.multi_gpu_tests
+     def test_serialization_shared_tensors(self):
+-        model_checkpoint = "roberta-base"
++        model_checkpoint = "/opt/big_models/roberta-base"
+         peft_config = LoraConfig(
+             task_type=TaskType.TOKEN_CLS, inference_mode=False, r=16, lora_alpha=16, lora_dropout=0.1, bias="all"
+         )
+-        model = AutoModelForTokenClassification.from_pretrained(model_checkpoint, num_labels=11).to("cuda")
++        
++        model = AutoModelForTokenClassification.from_pretrained(model_checkpoint, num_labels=11).to(self.device_str)
+         model = get_peft_model(model, peft_config)
+ 
+         with tempfile.TemporaryDirectory() as tmp_dir:
+diff --git a/tests/test_config.py b/tests/test_config.py
+index 34f0423..af69e1f 100644
+--- a/tests/test_config.py
++++ b/tests/test_config.py
+@@ -38,7 +38,7 @@ from peft import (
+ )
+ 
+ 
+-PEFT_MODELS_TO_TEST = [("lewtun/tiny-random-OPTForCausalLM-delta", "v1")]
++PEFT_MODELS_TO_TEST = [("/opt/big_models/tiny-random-OPTForCausalLM-delta", "v1")]
+ 
+ ALL_CONFIG_CLASSES = (
+     # TODO: uncomment once PEFT works again with transformers
+@@ -126,14 +126,6 @@ class PeftConfigTester(unittest.TestCase):
+                 # Test we can load config from delta
+                 config_class.from_pretrained(model_name, revision=revision, cache_dir=tmp_dirname)
+ 
+-    def test_from_pretrained_cache_dir_remote(self):
+-        r"""
+-        Test if the config is correctly loaded with a checkpoint from the hub
+-        """
+-        with tempfile.TemporaryDirectory() as tmp_dirname:
+-            PeftConfig.from_pretrained("ybelkada/test-st-lora", cache_dir=tmp_dirname)
+-            self.assertTrue("models--ybelkada--test-st-lora" in os.listdir(tmp_dirname))
+-
+     @parameterized.expand(ALL_CONFIG_CLASSES)
+     def test_set_attributes(self, config_class):
+         # manually set attributes and check if they are correctly written
+diff --git a/tests/test_custom_models.py b/tests/test_custom_models.py
+index 347df21..6cd175b 100644
+--- a/tests/test_custom_models.py
++++ b/tests/test_custom_models.py
+@@ -1071,7 +1071,6 @@ class MultipleActiveAdaptersTester(unittest.TestCase):
+ 
+         self.assertTrue(torch.allclose(logits_merged_adapter_default, logits_adapter_1, atol=1e-3, rtol=1e-3))
+ 
+-
+ class RequiresGradTester(unittest.TestCase):
+     """Test that requires_grad is set correctly in specific circumstances
+ 
+diff --git a/tests/test_decoder_models.py b/tests/test_decoder_models.py
+index ab49c3e..f57f7b6 100644
+--- a/tests/test_decoder_models.py
++++ b/tests/test_decoder_models.py
+@@ -25,14 +25,14 @@ from .testing_common import PeftCommonTester, PeftTestConfigManager
+ 
+ 
+ PEFT_DECODER_MODELS_TO_TEST = [
+-    "hf-internal-testing/tiny-random-OPTForCausalLM",
+-    "hf-internal-testing/tiny-random-GPTNeoXForCausalLM",
+-    "hf-internal-testing/tiny-random-GPT2LMHeadModel",
+-    "hf-internal-testing/tiny-random-BloomForCausalLM",
+-    "hf-internal-testing/tiny-random-gpt_neo",
+-    "hf-internal-testing/tiny-random-GPTJForCausalLM",
+-    "hf-internal-testing/tiny-random-GPTBigCodeForCausalLM",
+-    "HuggingFaceM4/tiny-random-LlamaForCausalLM",
++    "/opt/big_models/tiny-random-OPTForCausalLM",
++    "/opt/big_models/tiny-random-GPTNeoXForCausalLM",
++    "/opt/big_models/tiny-random-GPT2LMHeadModel",
++    "/opt/big_models/tiny-random-BloomForCausalLM",
++    "/opt/big_models/tiny-random-gpt_neo",
++    "/opt/big_models/tiny-random-GPTJForCausalLM",
++    "/opt/big_models/tiny-random-GPTBigCodeForCausalLM",
++    "/opt/big_models/tiny-random-LlamaForCausalLM",
+ ]
+ 
+ FULL_GRID = {
+@@ -99,7 +99,7 @@ class PeftDecoderModelTester(unittest.TestCase, PeftCommonTester):
+             mock(*args, **kwargs)
+             return orig_from_pretrained(config.tokenizer_name_or_path)
+ 
+-        model_id = "hf-internal-testing/tiny-random-OPTForCausalLM"
++        model_id = "/opt/big_models/tiny-random-OPTForCausalLM"
+         config = PromptTuningConfig(
+             base_model_name_or_path=model_id,
+             tokenizer_name_or_path=model_id,
+@@ -119,7 +119,7 @@ class PeftDecoderModelTester(unittest.TestCase, PeftCommonTester):
+     def test_prompt_tuning_config_invalid_args(self):
+         # Raise an error when tokenizer_kwargs is used with prompt_tuning_init!='TEXT', because this argument has no
+         # function in that case
+-        model_id = "hf-internal-testing/tiny-random-OPTForCausalLM"
++        model_id = "/opt/big_models/tiny-random-OPTForCausalLM"
+         msg = "tokenizer_kwargs only valid when using prompt_tuning_init='TEXT'."
+         with self.assertRaisesRegex(ValueError, expected_regex=msg):
+             PromptTuningConfig(
+@@ -286,7 +286,7 @@ class PeftDecoderModelTester(unittest.TestCase, PeftCommonTester):
+ 
+     def test_generate_adalora_no_dropout(self):
+         # test for issue #730
+-        model_id = "hf-internal-testing/tiny-random-OPTForCausalLM"
++        model_id = "/opt/big_models/tiny-random-OPTForCausalLM"
+         config_kwargs = {
+             "target_modules": None,
+             "task_type": "CAUSAL_LM",
+diff --git a/tests/test_encoder_decoder_models.py b/tests/test_encoder_decoder_models.py
+index 8aab9ed..7356783 100644
+--- a/tests/test_encoder_decoder_models.py
++++ b/tests/test_encoder_decoder_models.py
+@@ -25,8 +25,8 @@ from .testing_common import PeftCommonTester, PeftTestConfigManager
+ 
+ 
+ PEFT_ENCODER_DECODER_MODELS_TO_TEST = [
+-    "ybelkada/tiny-random-T5ForConditionalGeneration-calibrated",
+-    "hf-internal-testing/tiny-random-BartForConditionalGeneration",
++    "/opt/big_models/tiny-random-T5ForConditionalGeneration-calibrated",
++    "/opt/big_models/tiny-random-BartForConditionalGeneration",
+ ]
+ 
+ FULL_GRID = {"model_ids": PEFT_ENCODER_DECODER_MODELS_TO_TEST, "task_type": "SEQ_2_SEQ_LM"}
+@@ -195,7 +195,7 @@ class PeftEncoderDecoderCustomModelTester(unittest.TestCase):
+     """
+ 
+     def test_save_shared_tensors(self):
+-        model_id = "hf-internal-testing/tiny-random-RobertaModel"
++        model_id = "/opt/big_models/tiny-random-RobertaModel"
+         peft_config = LoraConfig(
+             task_type=TaskType.TOKEN_CLS, inference_mode=False, r=16, lora_alpha=16, lora_dropout=0.1, bias="all"
+         )
+diff --git a/tests/test_feature_extraction_models.py b/tests/test_feature_extraction_models.py
+index 2b4331a..556f1cd 100644
+--- a/tests/test_feature_extraction_models.py
++++ b/tests/test_feature_extraction_models.py
+@@ -24,10 +24,10 @@ from .testing_common import PeftCommonTester, PeftTestConfigManager
+ 
+ 
+ PEFT_FEATURE_EXTRACTION_MODELS_TO_TEST = [
+-    "hf-internal-testing/tiny-random-BertModel",
+-    "hf-internal-testing/tiny-random-RobertaModel",
+-    "hf-internal-testing/tiny-random-DebertaModel",
+-    "hf-internal-testing/tiny-random-DebertaV2Model",
++    "/opt/big_models/tiny-random-BertModel",
++    "/opt/big_models/tiny-random-RobertaModel",
++    "/opt/big_models/tiny-random-DebertaModel",
++    "/opt/big_models/tiny-random-DebertaV2Model",
+ ]
+ 
+ FULL_GRID = {
+diff --git a/tests/test_gpu_examples.py b/tests/test_gpu_examples.py
+index 1af1919..47ed17a 100644
+--- a/tests/test_gpu_examples.py
++++ b/tests/test_gpu_examples.py
+@@ -110,10 +110,10 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+     """
+ 
+     def setUp(self):
+-        self.seq2seq_model_id = "google/flan-t5-base"
+-        self.causal_lm_model_id = "facebook/opt-6.7b"
++        self.seq2seq_model_id = "/opt/big_models/flan-t5-base"
++        self.causal_lm_model_id = "/opt/big_models/opt-6.7b"
+         self.tokenizer = AutoTokenizer.from_pretrained(self.causal_lm_model_id)
+-        self.audio_model_id = "openai/whisper-large"
++        self.audio_model_id = "/opt/big_models/whisper-large"
+ 
+     def tearDown(self):
+         r"""
+@@ -162,7 +162,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("ybelkada/english_quotes_copy")
++            data = load_dataset("/opt/nlp_data/english_quotes_copy")
+             data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -220,7 +220,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("ybelkada/english_quotes_copy")
++            data = load_dataset("/opt/nlp_data/english_quotes_copy")
+             data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -281,7 +281,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("Abirate/english_quotes")
++            data = load_dataset("/opt/nlp_data/english_quotes")
+             data = data.map(lambda samples: self.tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -316,7 +316,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+         r"""
+         Tests the 4bit training with adalora
+         """
+-        model_id = "facebook/opt-350m"
++        model_id = "/opt/big_models/opt-350m"
+ 
+         model = AutoModelForCausalLM.from_pretrained(model_id, load_in_4bit=True)
+         tokenizer = AutoTokenizer.from_pretrained(model_id)
+@@ -341,7 +341,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+         model = get_peft_model(model, peft_config)
+ 
+-        data = load_dataset("ybelkada/english_quotes_copy")
++        data = load_dataset("/opt/nlp_data/english_quotes_copy")
+         data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+         batch = tokenizer(data["train"][:3]["quote"], return_tensors="pt", padding=True)
+         self._check_inference_finite(model, batch)
+@@ -379,7 +379,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+         r"""
+         Tests the 8bit training with adalora
+         """
+-        model_id = "facebook/opt-350m"
++        model_id = "/opt/big_models/opt-350m"
+ 
+         model = AutoModelForCausalLM.from_pretrained(model_id, load_in_8bit=True)
+         tokenizer = AutoTokenizer.from_pretrained(model_id)
+@@ -404,7 +404,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+         model = get_peft_model(model, peft_config)
+ 
+-        data = load_dataset("ybelkada/english_quotes_copy")
++        data = load_dataset("/opt/nlp_data/english_quotes_copy")
+         data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+         batch = tokenizer(data["train"][:3]["quote"], return_tensors="pt", padding=True)
+         self._check_inference_finite(model, batch)
+@@ -471,7 +471,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("Abirate/english_quotes")
++            data = load_dataset("/opt/nlp_data/english_quotes")
+             data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -531,7 +531,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("ybelkada/english_quotes_copy")
++            data = load_dataset("/opt/nlp_data/english_quotes_copy")
+             data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -592,7 +592,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("ybelkada/english_quotes_copy")
++            data = load_dataset("/opt/nlp_data/english_quotes_copy")
+             data = data.map(lambda samples: tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -628,7 +628,7 @@ class PeftBnbGPUExampleTests(unittest.TestCase):
+         https://github.com/huggingface/peft/blob/main/examples/int8_training/peft_bnb_whisper_large_v2_training.ipynb
+         """
+         with tempfile.TemporaryDirectory() as tmp_dir:
+-            dataset_name = "ybelkada/common_voice_mr_11_0_copy"
++            dataset_name = "/opt/nlp_data/common_voice_mr_11_0_copy"
+             task = "transcribe"
+             language = "Marathi"
+             common_voice = DatasetDict()
+@@ -731,7 +731,7 @@ class PeftGPTQGPUTests(unittest.TestCase):
+     def setUp(self):
+         from transformers import GPTQConfig
+ 
+-        self.causal_lm_model_id = "marcsun13/opt-350m-gptq-4bit"
++        self.causal_lm_model_id = "/opt/big_models/opt-350m-gptq-4bit"
+         # TODO : check if it works for Exllamav2 kernels
+         self.quantization_config = GPTQConfig(bits=4, use_exllama=False)
+         self.tokenizer = AutoTokenizer.from_pretrained(self.causal_lm_model_id)
+@@ -777,7 +777,7 @@ class PeftGPTQGPUTests(unittest.TestCase):
+             )
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("ybelkada/english_quotes_copy")
++            data = load_dataset("/opt/big_models/english_quotes_copy")
+             data = data.map(lambda samples: self.tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+@@ -839,7 +839,7 @@ class PeftGPTQGPUTests(unittest.TestCase):
+ 
+         model = get_peft_model(model, peft_config)
+ 
+-        data = load_dataset("ybelkada/english_quotes_copy")
++        data = load_dataset("/opt/big_models/english_quotes_copy")
+         data = data.map(lambda samples: self.tokenizer(samples["quote"]), batched=True)
+         batch = tokenizer(data["train"][:3]["quote"], return_tensors="pt", padding=True)
+         self._check_inference_finite(model, batch)
+@@ -905,7 +905,7 @@ class PeftGPTQGPUTests(unittest.TestCase):
+ 
+             model = get_peft_model(model, config)
+ 
+-            data = load_dataset("Abirate/english_quotes")
++            data = load_dataset("/opt/nlp_data/english_quotes")
+             data = data.map(lambda samples: self.tokenizer(samples["quote"]), batched=True)
+ 
+             trainer = Trainer(
+diff --git a/tests/test_hub_features.py b/tests/test_hub_features.py
+deleted file mode 100644
+index 44e9d6b..0000000
+--- a/tests/test_hub_features.py
++++ /dev/null
+@@ -1,38 +0,0 @@
+-# coding=utf-8
+-# Copyright 2023-present the HuggingFace Inc. team.
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#     http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
+-import unittest
+-
+-from transformers import AutoModelForCausalLM
+-
+-from peft import PeftConfig, PeftModel
+-
+-
+-PEFT_MODELS_TO_TEST = [("peft-internal-testing/test-lora-subfolder", "test")]
+-
+-
+-class PeftHubFeaturesTester(unittest.TestCase):
+-    def test_subfolder(self):
+-        r"""
+-        Test if subfolder argument works as expected
+-        """
+-        for model_id, subfolder in PEFT_MODELS_TO_TEST:
+-            config = PeftConfig.from_pretrained(model_id, subfolder=subfolder)
+-
+-            model = AutoModelForCausalLM.from_pretrained(
+-                config.base_model_name_or_path,
+-            )
+-            model = PeftModel.from_pretrained(model, model_id, subfolder=subfolder)
+-
+-            self.assertTrue(isinstance(model, PeftModel))
+diff --git a/tests/test_multitask_prompt_tuning.py b/tests/test_multitask_prompt_tuning.py
+index 9aa6b8d..11c52a6 100644
+--- a/tests/test_multitask_prompt_tuning.py
++++ b/tests/test_multitask_prompt_tuning.py
+@@ -240,7 +240,7 @@ class MultiTaskPromptTuningTester(TestCase, PeftCommonTester):
+         task_ids = torch.tensor([1, 2]).to(self.torch_device)
+ 
+         original = LlamaForCausalLM.from_pretrained(
+-            "trl-internal-testing/tiny-random-LlamaForCausalLM", torch_dtype=torch.bfloat16
++            "/opt/big_models/tiny-random-LlamaForCausalLM", torch_dtype=torch.bfloat16
+         )
+         mpt = get_peft_model(original, self._create_multitask_prompt_tuning_config())
+         mpt = mpt.to(self.torch_device)
+diff --git a/tests/test_stablediffusion.py b/tests/test_stablediffusion.py
+index 830614a..2a7ecbe 100644
+--- a/tests/test_stablediffusion.py
++++ b/tests/test_stablediffusion.py
+@@ -26,7 +26,7 @@ from .testing_common import ClassInstantier, PeftCommonTester
+ from .testing_utils import temp_seed
+ 
+ 
+-PEFT_DIFFUSERS_SD_MODELS_TO_TEST = ["hf-internal-testing/tiny-stable-diffusion-torch"]
++PEFT_DIFFUSERS_SD_MODELS_TO_TEST = ["/opt/big_models/tiny-stable-diffusion-torch"]
+ CONFIG_TESTING_KWARGS = (
+     {
+         "text_encoder": {
+diff --git a/tests/test_tuners_utils.py b/tests/test_tuners_utils.py
+index 7cc0a17..f7a7b79 100644
+--- a/tests/test_tuners_utils.py
++++ b/tests/test_tuners_utils.py
+@@ -107,7 +107,7 @@ class PeftCustomKwargsTester(unittest.TestCase):
+     def test_regex_matching_valid(self, key, target_modules, layers_to_transform, layers_pattern, expected_result):
+         # We use a LoRA Config for testing, but the regex matching function is common for all BaseTuner subclasses.
+         # example model_id for config initialization. key is matched only against the target_modules given, so this can be any model
+-        model_id = "peft-internal-testing/tiny-OPTForCausalLM-lora"
++        model_id = "/opt/big_models/tiny-OPTForCausalLM-lora"
+         config = LoraConfig(
+             base_model_name_or_path=model_id,
+             target_modules=target_modules,
+@@ -122,7 +122,7 @@ class PeftCustomKwargsTester(unittest.TestCase):
+         # users to easily debug their configuration. Here we only test a single case, not all possible combinations of
+         # configs that could exist. This is okay as the method calls `check_target_module_exists` internally, which
+         # has been extensively tested above.
+-        model_id = "hf-internal-testing/tiny-random-BloomForCausalLM"
++        model_id = "/opt/big_models/tiny-random-BloomForCausalLM"
+         model = self.transformers_class.from_pretrained(model_id)
+         # by default, this model matches query_key_value
+         config = LoraConfig()
+@@ -145,7 +145,7 @@ class PeftCustomKwargsTester(unittest.TestCase):
+             self.assertFalse(key in unmatched)
+ 
+     def test_feedforward_matching_ia3(self):
+-        model_id = "hf-internal-testing/tiny-random-T5ForConditionalGeneration"
++        model_id = "/opt/big_models/tiny-random-T5ForConditionalGeneration"
+         model = self.transformers_class.from_pretrained(model_id)
+         # simple example for just one t5 block for testing
+         config_kwargs = {

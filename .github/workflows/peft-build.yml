@@ -62,7 +62,7 @@ jobs:
               print(f"Device Available: {torch.npu.is_available()}")
           EOF
 
-  install_fastchat:
+  install_peft:
     runs-on: ascend-910b
     needs: check_npu_environment
     container:
@@ -72,7 +72,7 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/envs/fschat:/root/data
+        - /data/disk3/action/envs/peft:/root/data
         - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/projects/peft:/__w/llm-tool-ci/llm-tool-ci/peft
 
