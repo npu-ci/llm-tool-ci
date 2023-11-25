@@ -31,11 +31,11 @@ jobs:
         - name: Copy_Test_Cases
           working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           run: |
-            cp peft_test/peft_npu_test.patch /__w/hf-ci-demo/hf-ci-demo/peft/
+            cp peft_test/peft_npu_test.patch /__w/lm-tool-ci/llm-tool-ci/peft/
 
         - name: run_official_cases
           timeout-minutes: 20
-          working-directory: /__w/hf-ci-demo/hf-ci-demo/peft
+          working-directory: /__w/lm-tool-ci/llm-tool-ci/peft
           run: |
             git apply -3 --whitespace=fix peft_npu_test.patch
             make test
