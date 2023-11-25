@@ -3,7 +3,7 @@ run-name: FastChat NPU FineTune
 
 on:
   workflow_run:
-    workflows: [FastChat NPU Inference]
+    workflows: [FastChat NPU Deploy]
     types:
       - completed
 
