@@ -2,25 +2,10 @@ name: PEFT NPU Build
 run-name: PEFT NPU Build
 
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-      print_tags:
-        description: 'True to print to STDOUT'
-        required: true
-        type: boolean
-      tags:
-        description: 'Test scenario tags'
-        required: true
-        type: string
+  schedule:
+    - cron: '30 0 * * *'
+  issue_comment:
+     types: [created]
 
 jobs:
   check_runner:

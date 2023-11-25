@@ -1,11 +1,9 @@
-name: FastChat NPU Build
-run-name: FastChat NPU Build
+name: FastChat NPU Inference
+run-name: FastChat NPU Inference
 
 on:
    schedule:
      - cron: '30 0 * * *'
-   issue_comment:
-     types: [created]
 
 jobs:
   check_runner:
@@ -101,6 +99,7 @@ jobs:
             mv /root/miniconda/envs/torch_npu /root/data
   run_tests:
     runs-on: ascend-910b
+    needs: install_fastchat
     container:
       image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:

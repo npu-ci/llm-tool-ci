@@ -36,7 +36,7 @@ parser.add_argument(
     "-n",
     type=str,
     default=None,
-    choices=["transformers", "accelerate", "peft", "sfl"],
+    choices=["transformers", "accelerate", "peft", "fschat"],
     help="Specify a tool name.",
 )
 
