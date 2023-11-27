@@ -35,7 +35,7 @@ jobs:
 
         - name: run_official_cases
           timeout-minutes: 20
-          working-directory: /__w/lm-tool-ci/llm-tool-ci/peft
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/peft
           run: |
             git apply -3 --whitespace=fix peft_npu_test.patch
             make test
