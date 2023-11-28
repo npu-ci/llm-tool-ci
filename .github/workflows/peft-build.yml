@@ -79,7 +79,8 @@ jobs:
           run: |
             git pull
             pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install peft transformers accelerate pytest pytest-cov pytest-xdist parameterized datasets -i https://pypi.mirrors.ustc.edu.cn/simple
+            pip install -e .[test] -i https://pypi.tuna.tsinghua.edu.cn/simple
+            pip install evaluate scikit-learn -i https://pypi.tuna.tsinghua.edu.cn/simple
         - name: Get CI Code
           uses: actions/checkout@v4
           with:
