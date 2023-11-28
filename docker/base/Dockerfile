@@ -103,11 +103,3 @@ RUN echo "[source.crates-io]\n"\
 
 # avoid import torch_npu error (from Install Rust)
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-
-# Post Processing for Transformers
-run pip install --no-cache-dir sudachipy>=0.6.6 -i ${PIP_SOURCE_URL}
-
-RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y \
-    libsndfile1 && \
-    rm -rf /var/lib/apt/lists/*
