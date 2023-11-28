@@ -33,12 +33,13 @@ jobs:
       - name: Preprocess
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
-          cp peft_test/scan_models/sequence_classification_lora.py /__w/llm-tool-ci/llm-tool-ci/peft/
+          cp peft_test/cases/scan_models/sequence_classification_lora.py /__w/llm-tool-ci/llm-tool-ci/peft/
           cp peft_test/peft-model-test-map.json /__w/llm-tool-ci/llm-tool-ci/peft/
       - name: Run Scan Models
         timeout-minutes: 20
         working-directory: /__w/llm-tool-ci/llm-tool-ci/peft
         run: |
+          export LD_PRELOAD=$LD_PRELOAD:/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
           python sequence_classification_lora.py peft-model-test-map.json
           echo 'scan models done.'
           cp peft-models.json /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
