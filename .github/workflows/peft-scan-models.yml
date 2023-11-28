@@ -23,6 +23,7 @@ jobs:
         - /data/disk3/action/envs/peft/torch_npu:/root/miniconda/envs/torch_npu
         - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/projects/peft:/__w/llm-tool-ci/llm-tool-ci/peft
+        - /data/disk3/action/projects/evaluate:/__w/llm-tool-ci/llm-tool-ci/evaluate
       options: --network host
         --device /dev/davinci_manager
         --device /dev/devmm_svm
@@ -30,6 +31,13 @@ jobs:
         --device /dev/davinci6
         --device /dev/davinci7
     steps:
+      - name: Get evaluate Latest Code
+        uses: actions/checkout@v4
+        with:
+          repository: huggingface/evaluate
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: evaluate
+          clean: true
       - name: Preprocess
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |

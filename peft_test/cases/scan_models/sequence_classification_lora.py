@@ -120,7 +120,7 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
 
 if __name__ == '__main__':
     dataset_ = "/opt/nlp_data/glue/glue.py"
-    evaluate_path = "/opt/projects/evaluate/metrics/glue/glue.py"
+    evaluate_path = "/__w/llm-tool-ci/llm-tool-ci/evaluate/metrics/glue/glue.py"
     task_ = "mrpc"
     device_ = "npu:0"
     args = sys.argv[1:]
