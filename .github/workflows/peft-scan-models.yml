@@ -33,7 +33,7 @@ jobs:
       - name: Preprocess
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
-          cp peft_test/scan_models/sequence_classification_lora.py /__w/llm-tool-ci/llm-tool-ci/peft/
+          cp peft_test/cases/scan_models/sequence_classification_lora.py /__w/llm-tool-ci/llm-tool-ci/peft/
           cp peft_test/peft-model-test-map.json /__w/llm-tool-ci/llm-tool-ci/peft/
       - name: Run Scan Models
         timeout-minutes: 20
