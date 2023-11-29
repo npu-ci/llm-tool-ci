@@ -21,7 +21,7 @@ jobs:
         - /data/disk3/action/models/hub/:/opt/big_models/
         - /data/disk3/action/nlp_data/:/opt/nlp_data/
         - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
         - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
       options: --network host
                --device /dev/davinci_manager
