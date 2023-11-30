@@ -51,7 +51,7 @@ jobs:
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/datasets:/root/datasets
+        - /data/disk3/action/nlp_data/glue/mrpc:/root/datasets/glue/mrpc
         - /data/disk3/action/models:/root/models
         - /data/disk3/action/metric:/root/metric
       options: --network host
@@ -70,7 +70,7 @@ jobs:
           export LD_PRELOAD='/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0'
           sed -i "s/from datasets import load_dataset/from datasets import load_dataset, load_from_disk/g" examples/complete_nlp_example.py
           sed -i "s#bert-base-cased#/root/models/hub/bert-base-cased#g" examples/complete_nlp_example.py
-          sed -i 's#load_dataset("glue", "mrpc")#load_from_disk("/root/datasets/glue")#g' examples/complete_nlp_example.py
+          sed -i 's#load_dataset("glue", "mrpc")#load_from_disk("/root/datasets/glue/mrpc")#g' examples/complete_nlp_example.py
           sed -i 's#evaluate.load("glue", "mrpc")#evaluate.load(config_name="mrpc", path="/root/metric/glue/glue.py")#g' examples/complete_nlp_example.py
           python examples/complete_nlp_example.py 
 
