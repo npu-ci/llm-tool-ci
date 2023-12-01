@@ -1,0 +1,49 @@
+name: Accelerate NPU UnitTest
+run-name: Accelerate NPU UnitTest
+
+on: 
+  workflow_run:
+    workflows: [Accelerate NPU Build]
+    types:
+      - completed
+
+env:
+  HF_HOME: /root/models
+
+jobs:       
+  UnitTest:
+    runs-on: ascend-910b
+    container: 
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-sibo:latest
+      volumes:
+        - /usr/local/dcmi:/usr/local/dcmi
+        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
+        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
+        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
+        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
+        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
+      options: --network host
+              --device /dev/davinci_manager
+              --device /dev/devmm_svm
+              --device /dev/hisi_hdc
+              --device /dev/davinci6
+              --device /dev/davinci7
+    steps:
+      - name: Unit-Test
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/accelerate
+        run: | 
+           pip install pytest parameterized evaluate -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+           # test accelerator
+           sed -i "s/@require_multi_gpu//g" tests/test_multigpu.py
+           sed -i "s/@require_cuda//g" tests/test_multigpu.py
+           sed -i "s/@cuda/npu/g" tests/test_multigpu.py
+           pytest -sv tests/test_accelerator.py
+
+           # test multigpu
+           sed -i "s/@require_multi_gpu//g" tests/test_multigpu.py
+           sed -i "s/cuda/npu/g" tests/test_multigpu.py
+           sed -i 's/device_map = {"linear1": 0, "batchnorm": "cpu", "linear2": 1}/device_map = {"linear1": "npu:0", "batchnorm": "cpu", "linear2": "npu:1"}/g' tests/test_multigpu.py
+           sed -i "s/dl = create_dataloader(accelerator, dataset_size=3, batch_size=1)/dl = create_dataloader(accelerator, dataset_size=4, batch_size=1)/g" src/accelerate/test_utils/scripts/test_distributed_data_loop.py
+           sed -i "s/assert batch_idxs == \[0\]/assert batch_idxs == \[0, 1\]/g" src/accelerate/test_utils/scripts/test_distributed_data_loop.py
+           pytest -sv tests/test_multigpu.py
