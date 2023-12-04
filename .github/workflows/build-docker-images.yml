@@ -27,11 +27,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ./docker/transformers
-          build-args: |
-            REF=main
-          push: true
-          tags: zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
+        name: Build Docker Image
+        run: |
+          pwd
+          cd docker/transformers
+          pwd
+          docker build -t zhangsibo1129/ubuntu-cann-torch21-py39:latest -f ./Dockerfile .
+      -
+        name: Push Docker Image
+        run: |
+          pwd
+          cd docker/transformers
+          pwd
+          docker push zhangsibo1129/ubuntu-cann-torch21-py39:latest
