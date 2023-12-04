@@ -48,6 +48,8 @@ if __name__ == "__main__":
             _fine_cmd = finetune_cmd % model_path
             if "llama" in model_name or "Llama" in model_name:
                 _fine_cmd = _fine_cmd + "  --fsdp_transformer_layer_cls_to_wrap 'LlamaDecoderLayer'"
+            if "bert" in model_name:
+                _fine_cmd = _fine_cmd + "  --fsdp_transformer_layer_cls_to_wrap 'BertLayer'"
             try:
                 test_multi_npu(_fine_cmd, infer_cmd)
                 result_dict[model_name] = True
