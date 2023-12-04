@@ -49,7 +49,7 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/data:/__w/llm-tool-ci/llm-tool-ci
+        - /data/disk3/action/data/accelerate:/__w/llm-tool-ci/llm-tool-ci/accelerate
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
         - /data/disk3/action/nlp_data/glue/mrpc:/root/datasets/glue/mrpc
         - /data/disk3/action/models:/root/models
