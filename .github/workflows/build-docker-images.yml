@@ -30,13 +30,13 @@ jobs:
         name: Build Docker Image
         run: |
           pwd
-          cd docker/transformers
+          cd llm-tool-ci/docker/transformers
           pwd
           docker build -t zhangsibo1129/ubuntu-cann-torch21-py39:latest -f ./Dockerfile .
       -
         name: Push Docker Image
         run: |
           pwd
-          cd docker/transformers
+          cd llm-tool-ci/docker/transformers
           pwd
           docker push zhangsibo1129/ubuntu-cann-torch21-py39:latest
