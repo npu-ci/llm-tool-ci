@@ -14,6 +14,7 @@ RUN git clone https://github.com/huggingface/transformers && \
 
 ENV PIP_SOURCE_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 
-RUN pip install --no-cache-dir -e ".[dev-torch]" -i ${PIP_SOURCE_URL}
+RUN cd transformers && \
+    pip install --no-cache-dir -e ".[dev-torch]" -i ${PIP_SOURCE_URL}
 
 RUN pip uninstall -y scikit-learn
