@@ -8,12 +8,10 @@ RUN apt update && \
     libsndfile1 && \
     rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/huggingface/transformers && \
-    cd transformers && \
+RUN git clone https://github.com/lm-sys/FastChat.git && \
+    cd FastChat && \
     git checkout $REF
 
 ENV PIP_SOURCE_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 
-RUN pip install --no-cache-dir -e ".[dev-torch]" -i ${PIP_SOURCE_URL}
-
-RUN pip uninstall -y scikit-learn
+RUN pip install --no-cache-dir -e ".[model_worker,webui]" -i ${PIP_SOURCE_URL}
