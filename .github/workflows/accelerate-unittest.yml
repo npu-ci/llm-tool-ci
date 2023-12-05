@@ -26,8 +26,8 @@ jobs:
               --device /dev/davinci_manager
               --device /dev/devmm_svm
               --device /dev/hisi_hdc
-              --device /dev/davinci6
-              --device /dev/davinci7
+              --device /dev/davinci1
+              --device /dev/davinci2
     steps:
       - name: Unit-Test
         working-directory: /__w/llm-tool-ci/llm-tool-ci/accelerate

@@ -58,20 +58,18 @@ jobs:
               --device /dev/davinci_manager
               --device /dev/devmm_svm
               --device /dev/hisi_hdc
-              --device /dev/davinci6
-              --device /dev/davinci7
+              --device /dev/davinci1
+              --device /dev/davinci2
     steps: 
       - name: Scan Model
         id: scan_model
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/accelerate
+        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         # LD_PRELOAD to ignore scikit-learn import order error 
         run: | 
           pip install evaluate datasets transformers scikit-learn -i https://pypi.tuna.tsinghua.edu.cn/simple
           export LD_PRELOAD='/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0'
-          sed -i "s#bert-base-cased#/root/models/hub/bert-base-cased#g" examples/complete_nlp_example.py
-          sed -i 's#load_dataset("glue", "mrpc")#load_dataset("/root/datasets/glue/glue.py", "mrpc")#g' examples/complete_nlp_example.py
-          sed -i 's#evaluate.load("glue", "mrpc")#evaluate.load(config_name="mrpc", path="/root/metric/glue/glue.py")#g' examples/complete_nlp_example.py
-          python examples/complete_nlp_example.py 
+          
+          python accelerate_test/case/scan_models/complete_nlp_example.py --model_name /root/models/hub/bert-base-cased
 
       - name: Write Result(True)
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
