@@ -20,14 +20,14 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
+        - /data/disk3/action/data/accelerate:/__w/llm-tool-ci/llm-tool-ci/accelerate
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
       options: --network host
               --device /dev/davinci_manager
               --device /dev/devmm_svm
               --device /dev/hisi_hdc
-              --device /dev/davinci6
-              --device /dev/davinci7
+              --device /dev/davinci1
+              --device /dev/davinci2
     steps:
       - name: Unit-Test
         working-directory: /__w/llm-tool-ci/llm-tool-ci/accelerate

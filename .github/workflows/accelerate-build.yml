@@ -30,8 +30,8 @@ jobs:
                --device /dev/davinci_manager
                --device /dev/devmm_svm
                --device /dev/hisi_hdc
-               --device /dev/davinci6
-               ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci7' || ''}}
+               --device /dev/davinci1
+               ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci2' || ''}}
     steps:
       - name: NPU-SMI
         run: npu-smi info
@@ -56,13 +56,12 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/data:/root/data
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
                --device /dev/hisi_hdc
-               --device /dev/davinci6
+               --device /dev/davinci1
     steps:
         - name: Get Latest Code
           uses: actions/checkout@v4
@@ -90,4 +89,5 @@ jobs:
           run: |
             rm -rf /root/data/torch_npu
             mv /root/miniconda/envs/torch_npu /root/data
-
+            rm -rf /root/data/accelerate
+            mv /__w/llm-tool-ci/llm-tool-ci/accelerate /root/data
