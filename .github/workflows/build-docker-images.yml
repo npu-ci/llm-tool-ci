@@ -1,7 +1,9 @@
 name: Transformers Docker Image
 run-name: Transformers Docker Image
 
-on: 
+on:
+  schedule:
+     - cron: '30 0 * * *'
 
 jobs:
   check_runner:

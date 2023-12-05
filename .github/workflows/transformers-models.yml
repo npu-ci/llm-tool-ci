@@ -1,9 +1,9 @@
-name: Transformers NPU Scan Models
-run-name: Transformers NPU Scan Models
+name: Transformers Scan Models
+run-name: Transformers Scan Models
 
 on:
   workflow_run:
-    workflows: [Transformers NPU Training]
+    workflows: [Transformers Training]
     types:
       - completed
 
@@ -13,27 +13,18 @@ env:
 jobs:
   check_out_code:
     runs-on: ascend-910b
-    container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
-      volumes:
-        - /usr/local/dcmi:/usr/local/dcmi
-        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
-        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
-        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
-      options: --network host
-
     steps:
-      - name: Get Latest Code
+      - 
+        name: Get Latest Code
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
           path: llm-tool-ci
 
-      - name: Create Empty File
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+      - 
+        name: Create Empty File
         run: |
+          cd llm-tool-ci
           python file_tool.py -f ./transformers.json --create
 
   scan_models:
@@ -43,15 +34,14 @@ jobs:
       matrix:
         model_type: [Llama2, Bert, BLOOM, GPT-2, OPT]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/models:/root/models
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
+        - /home/action/runners/ascend-910b/_work/llm-tool-ci/llm-tool-ci/llm-tool-ci:/root/llm-tool-ci
       options: --network host
               --device /dev/davinci_manager
               --device /dev/devmm_svm
@@ -59,16 +49,18 @@ jobs:
               --device /dev/davinci6
               --device /dev/davinci7
     steps: 
-      - name: Get Test File
+      - 
+        name: Get Test File
         id: test_file
         uses: zoexx/github-action-json-file-properties@release
         with:
-          file_path: "transformers-model-tests-map.json"
+          file_path: "/root/llm-tool-ci/transformers-model-tests-map.json"
           prop_path: ${{ matrix.model_type }}
 
-      - name: Scan Model
+      - 
+        name: Scan Model
         id: scan_model
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/transformers
+        working-directory: /root/transformers
         continue-on-error: true
         env:
           TRANSFORMERS_TEST_BACKEND: torch_npu
@@ -78,14 +70,16 @@ jobs:
         run: |
           pytest -k "not beam_search and not pipeline" ${{steps.test_file.outputs.value}}
 
-      - name: Write Result(True)
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+      - 
+        name: Write Result(True)
+        working-directory: /root/llm-tool-ci
         if: steps.scan_model.outcome == 'success' 
         run: |
           python file_tool.py -f transformers.json -a ${{ matrix.model_type }}:true
       
-      - name: Write Result(False)
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+      - 
+        name: Write Result(False)
+        working-directory: /root/llm-tool-ci
         if: steps.scan_model.outcome != 'success' 
         run: |
           python file_tool.py -f transformers.json -a ${{ matrix.model_type }}:false
@@ -94,34 +88,17 @@ jobs:
   update_table:
     runs-on: ascend-910b
     needs: scan_models
-    container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
-      volumes:
-        - /usr/local/dcmi:/usr/local/dcmi
-        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
-        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
-        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/data:/root/data
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
-      options: --network host
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: llm-tool-ci
-          clean: false
-
-      - name: Write Table to README
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+      - 
+        name: Write Table to README
+        working-directory: /home/action/runners/ascend-910b/_work/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
           python update_table.py -f README.md -t transformers.json -n transformers
 
-      - name: Commit
+      - 
+        name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update Transformers Table
-          repository: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+          repository: /home/action/runners/ascend-910b/_work/llm-tool-ci/llm-tool-ci/llm-tool-ci
           file_pattern: 'README.md'
