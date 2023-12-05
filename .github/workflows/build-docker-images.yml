@@ -1,7 +1,7 @@
 name: Transformers Docker Image
 run-name: Transformers Docker Image
 
-on: push
+on: 
 
 jobs:
   check_runner:
@@ -29,14 +29,10 @@ jobs:
       -
         name: Build Docker Image
         run: |
-          pwd
           cd llm-tool-ci/docker/transformers
-          pwd
           docker build -t zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest -f ./Dockerfile .
       -
         name: Push Docker Image
         run: |
-          pwd
           cd llm-tool-ci/docker/transformers
-          pwd
           docker push zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
