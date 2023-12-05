@@ -1,0 +1,7 @@
+{
+    "Llama2": "/opt/big_models/Llama-2-7b-chat-hf",
+    "Bert": "/opt/big_models/bert-base-uncased",
+    "BLOOM": "/opt/big_models/bloom-7b1",
+    "GPT-2": "/opt/big_models/gpt2",
+    "OPT": "/opt/big_models/opt-1.3b"
+}
