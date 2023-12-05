@@ -43,7 +43,7 @@ jobs:
               trainer.train()
           EOF
       - 
-        name: Trainer Verification (Nulti-NPU)
+        name: Trainer Verification (Multi-NPU)
         working-directory: /root/transformers
         if: matrix.machine_type == 'multi-npu' 
         run: | 

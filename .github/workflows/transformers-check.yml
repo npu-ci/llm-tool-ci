@@ -2,9 +2,8 @@ name: Transformers Check Environment
 run-name: Transformers Check Environment
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+     - cron: '0 1 * * *'
 
 jobs:
   check_runner:
