@@ -49,7 +49,7 @@ jobs:
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/data/accelerate:/__w/llm-tool-ci/llm-tool-ci/accelerate
+        - /data/disk3/action/data:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
         - /data/disk3/action/nlp_data/glue:/root/datasets/glue
         - /data/disk3/action/models:/root/models
@@ -66,7 +66,6 @@ jobs:
         working-directory: /__w/llm-tool-ci/llm-tool-ci/accelerate
         # LD_PRELOAD to ignore scikit-learn import order error 
         run: | 
-          ls /root/datasets/glue
           pip install evaluate datasets transformers scikit-learn -i https://pypi.tuna.tsinghua.edu.cn/simple
           export LD_PRELOAD='/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0'
           sed -i "s#bert-base-cased#/root/models/hub/bert-base-cased#g" examples/complete_nlp_example.py
