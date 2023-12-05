@@ -3,7 +3,7 @@ run-name: PEFT NPU Build
 
 on:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: '0 0 1 * *'
   issue_comment:
      types: [created]
 

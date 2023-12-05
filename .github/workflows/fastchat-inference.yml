@@ -3,7 +3,7 @@ run-name: FastChat NPU Inference
 
 on:
    schedule:
-     - cron: '30 0 * * *'
+     - cron: '0 30 1 * *'
 
 jobs:
   check_runner:
@@ -78,7 +78,7 @@ jobs:
           run: |
             git pull
             pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install "fschat[model_worker,webui]" -i https://pypi.tuna.tsinghua.edu.cn/simple
+            pip3 install -e ".[model_worker,webui]" -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install SentencePiece xformers -i https://pypi.tuna.tsinghua.edu.cn/simple
         - name: Get CI Code
           uses: actions/checkout@v4
