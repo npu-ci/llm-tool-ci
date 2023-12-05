@@ -30,8 +30,8 @@ jobs:
                --device /dev/davinci_manager
                --device /dev/devmm_svm
                --device /dev/hisi_hdc
-               --device /dev/davinci1
-               ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci2' || ''}}
+               --device /dev/davinci6
+               ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci7' || ''}}
     steps:
       - name: NPU-SMI
         run: npu-smi info
@@ -61,7 +61,7 @@ jobs:
                --device /dev/davinci_manager
                --device /dev/devmm_svm
                --device /dev/hisi_hdc
-               --device /dev/davinci1
+               --device /dev/davinci6
     steps:
         - name: Get Latest Code
           uses: actions/checkout@v4
