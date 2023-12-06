@@ -36,7 +36,7 @@ jobs:
         name: Build Docker Image
         run: |
           cd llm-tool-ci/docker/transformers
-          docker build -t zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest -f ./Dockerfile .
+          docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest -f ./Dockerfile .
       -
         name: Push Docker Image
         run: |
@@ -62,7 +62,7 @@ jobs:
         name: Build Docker Image
         run: |
           cd llm-tool-ci/docker/fschat
-          docker build -t zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest -f ./Dockerfile .
+          docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest -f ./Dockerfile .
       -
         name: Push Docker Image
         run: |
