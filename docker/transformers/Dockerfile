@@ -8,7 +8,7 @@ RUN apt update && \
     libsndfile1 && \
     rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/huggingface/transformers && \
+RUN git clone https://github.com/huggingface/transformers.git && \
     cd transformers && \
     git checkout $REF
 
