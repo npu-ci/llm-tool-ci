@@ -44,7 +44,7 @@ jobs:
 
   fschat-docker:
     runs-on: ascend-910b
-    needs: transformers-docker
+    needs: check-runner
     steps:
       -
         name: Get Latest Code
