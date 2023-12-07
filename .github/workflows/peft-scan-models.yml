@@ -12,7 +12,7 @@ jobs:
   scan_models:
     runs-on: ascend-910b
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -35,7 +35,7 @@ jobs:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
           path: evaluate
           clean: true
-      - name: Checkout Code
+      - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}

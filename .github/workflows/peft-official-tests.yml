@@ -9,7 +9,7 @@ jobs:
   run_tests:
     runs-on: ascend-910b
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -46,7 +46,12 @@ jobs:
             PeftModelForTokenClassification,
             )
             EOF
-
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+          with:
+            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+            path: llm-tool-ci
+            clean: false
         - name: Copy_Test_Cases
           working-directory: /root/llm-tool-ci
           run: |

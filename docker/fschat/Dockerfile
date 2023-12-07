@@ -3,8 +3,6 @@ FROM zhangsibo1129/ubuntu-cann-torch21-py39:latest
 ARG REF=main
 WORKDIR /root
 
-RUN git clone https://github.com/npu-ci/llm-tool-ci.git
-
 RUN git clone https://github.com/lm-sys/FastChat.git && \
     cd FastChat && \
     git checkout $REF

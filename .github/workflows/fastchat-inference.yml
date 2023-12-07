@@ -88,8 +88,14 @@ jobs:
                --device /dev/davinci6
                --device /dev/davinci7
     steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+          with:
+            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+            path: llm-tool-ci
+            clean: false
         - name: Copy_Test_Cases
-          working-directory: /root/llm-tool-ci
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           run: |
             cp fastchat_test/cases/inference/* /root/FastChat/tests/
 
