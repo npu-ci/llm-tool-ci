@@ -3,7 +3,7 @@ run-name: FastChat NPU Inference
 
 on:
    schedule:
-     - cron: '0 30 1 * *'
+     - cron: '30 1 * * *'
 
 jobs:
   check_runner:
@@ -19,7 +19,7 @@ jobs:
       matrix:
         machine_type: [single-npu, multi-npu]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -49,68 +49,38 @@ jobs:
     runs-on: ascend-910b
     needs: check_npu_environment
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub:/opt/big_models/
-        - /data/disk3/action/envs/fschat:/root/data
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
-        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
-
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
                --device /dev/hisi_hdc
                --device /dev/davinci6
     steps:
-        - name: Get FastChat Latest Code
-          uses: actions/checkout@v4
-          with:
-            repository: lm-sys/FastChat
-            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-            path: FastChat
-            clean: true
-        - name: Pull FastChat
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
-          run: |
-            git pull
-            pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip3 install -e ".[model_worker,webui]" -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install SentencePiece xformers -i https://pypi.tuna.tsinghua.edu.cn/simple
-        - name: Get CI Code
-          uses: actions/checkout@v4
-          with:
-            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-            path: llm-tool-ci
         - name: Import Verification
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+          working-directory: /root/FastChat
           run: |
             python << EOF
             if __name__ == '__main__':
                 from fastchat.conversation import SeparatorStyle
                 from fastchat.model.model_adapter import get_conversation_template
             EOF
-        - name: Persistent Python Interpreter
-          run: |
-            rm -rf /root/data/torch_npu
-            mv /root/miniconda/envs/torch_npu /root/data
   run_tests:
     runs-on: ascend-910b
     needs: install_fastchat
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub/:/opt/big_models/
-        - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
-        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
@@ -119,12 +89,12 @@ jobs:
                --device /dev/davinci7
     steps:
         - name: Copy_Test_Cases
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+          working-directory: /root/llm-tool-ci
           run: |
-            cp fastchat_test/cases/inference/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
+            cp fastchat_test/cases/inference/* /root/FastChat/tests/
 
         - name: run_inference_cases
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+          working-directory: /root/FastChat
           run: |
             cp tests/*.txt .
             python tests/test_cli.py
