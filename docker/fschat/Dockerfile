@@ -17,5 +17,4 @@ RUN git clone https://github.com/lm-sys/FastChat.git && \
 ENV PIP_SOURCE_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 
 RUN cd FastChat && \
-    pip install --no-cache-dir -e ".[model_worker,webui]" -i ${PIP_SOURCE_URL}
-    pip install SentencePiece -i ${PIP_SOURCE_URL}
+    pip install --no-cache-dir -e ".[model_worker]" -i ${PIP_SOURCE_URL}
