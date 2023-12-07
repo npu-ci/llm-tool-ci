@@ -12,7 +12,7 @@ jobs:
   scan_models:
     runs-on: ascend-910b
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -20,9 +20,6 @@ jobs:
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub/:/opt/big_models/
         - /data/disk3/action/nlp_data/:/opt/nlp_data/
-        - /data/disk3/action/envs/peft/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/projects/peft:/__w/llm-tool-ci/llm-tool-ci/peft
         - /data/disk3/action/projects/evaluate:/__w/llm-tool-ci/llm-tool-ci/evaluate
       options: --network host
         --device /dev/davinci_manager
@@ -38,6 +35,13 @@ jobs:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
           path: evaluate
           clean: true
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: llm-tool-ci
+          clean: false
+
       - name: Preprocess
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
@@ -52,33 +56,10 @@ jobs:
           echo 'scan models done.'
           cp peft-models.json /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
           echo 'peft-models.json copy done.'
-  update_readme:
-    runs-on: ascend-910b
-    needs: scan_models
-    container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
-      volumes:
-        - /usr/local/dcmi:/usr/local/dcmi
-        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
-        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
-        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/envs/peft/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-      options: --network host
-        --device /dev/davinci_manager
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: llm-tool-ci
-          clean: false
       - name: Write Table to README
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         run: |
           python update_table.py -f README.md -t peft-models.json -n peft
-
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
