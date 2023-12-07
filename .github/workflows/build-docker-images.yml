@@ -83,4 +83,4 @@ jobs:
             docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest -f ./Dockerfile .
         - name: Push Docker Image
           run: |
-            docker push zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest:latest
+            docker push zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest
