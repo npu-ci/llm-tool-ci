@@ -8,6 +8,8 @@ RUN apt update && \
     libsndfile1 && \
     rm -rf /var/lib/apt/lists/*
 
+RUN git clone https://github.com/npu-ci/llm-tool-ci.git
+
 RUN git clone https://github.com/lm-sys/FastChat.git && \
     cd FastChat && \
     git checkout $REF
@@ -15,4 +17,4 @@ RUN git clone https://github.com/lm-sys/FastChat.git && \
 ENV PIP_SOURCE_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 
 RUN cd FastChat && \
-    pip install --no-cache-dir -e ".[model_worker,webui]" -i ${PIP_SOURCE_URL}
+    pip install --no-cache-dir -e ".[model_worker]" -i ${PIP_SOURCE_URL}

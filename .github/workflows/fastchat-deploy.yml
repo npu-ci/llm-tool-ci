@@ -11,16 +11,13 @@ jobs:
   run_tests:
     runs-on: ascend-910b
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub/:/opt/big_models/
-        - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
-        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
@@ -29,12 +26,12 @@ jobs:
                --device /dev/davinci7
     steps:
         - name: Copy_Test_Cases
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+          working-directory: /root/llm-tool-ci
           run: |
-            cp fastchat_test/cases/deploy/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
+            cp fastchat_test/cases/deploy/* /root/FastChat/tests/
 
         - name: run_deploy_cases
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+          working-directory: /root/FastChat
           run: |
             cp tests/*.txt .
             nohup python tests/launch_openai_api_test_server.py > local_api.log 2>&1 &
