@@ -1,13 +1,9 @@
 name: Build Docker Images
 run-name: Build Docker Images
 
-# on:
-#   schedule:
-#      - cron: '0 0 * * *'
 on:
-  push:
-    branches:
-      - main
+  schedule:
+     - cron: '0 0 * * *'
 
 jobs:
   check-runner:
