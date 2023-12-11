@@ -3,7 +3,7 @@ run-name: FastChat NPU Inference
 
 on:
    schedule:
-     - cron: '30 1 * * *'
+     - cron: '0 2 * * *'
 
 jobs:
   check_runner:
