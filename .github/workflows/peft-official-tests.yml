@@ -29,22 +29,22 @@ jobs:
           run: |
             python << EOF
             if __name__ == '__main__':
-            from peft import (
-            AutoPeftModel,
-            AutoPeftModelForCausalLM,
-            AutoPeftModelForFeatureExtraction,
-            AutoPeftModelForQuestionAnswering,
-            AutoPeftModelForSeq2SeqLM,
-            AutoPeftModelForSequenceClassification,
-            AutoPeftModelForTokenClassification,
-            PeftModel,
-            PeftModelForCausalLM,
-            PeftModelForFeatureExtraction,
-            PeftModelForQuestionAnswering,
-            PeftModelForSeq2SeqLM,
-            PeftModelForSequenceClassification,
-            PeftModelForTokenClassification,
-            )
+                from peft import (
+                    AutoPeftModel,
+                    AutoPeftModelForCausalLM,
+                    AutoPeftModelForFeatureExtraction,
+                    AutoPeftModelForQuestionAnswering,
+                    AutoPeftModelForSeq2SeqLM,
+                    AutoPeftModelForSequenceClassification,
+                    AutoPeftModelForTokenClassification,
+                    PeftModel,
+                    PeftModelForCausalLM,
+                    PeftModelForFeatureExtraction,
+                    PeftModelForQuestionAnswering,
+                    PeftModelForSeq2SeqLM,
+                    PeftModelForSequenceClassification,
+                    PeftModelForTokenClassification,
+              )
             EOF
         - name: Checkout Repo
           uses: actions/checkout@v4
