@@ -142,7 +142,7 @@ def training_function(config, args):
     model = AutoModelForSequenceClassification.from_pretrained(args.model_name, return_dict=True)
     if 'gpt' in args.model_name:
         model.config.pad_token_id = model.config.eos_token_id
-
+        
     # We could avoid this line since the accelerator is set with `device_placement=True` (default value).
     # Note that if you are placing tensors on devices manually, this line absolutely needs to be before the optimizer
     # creation otherwise training will not work on TPU (`accelerate` will kindly throw an error to make us aware of that).

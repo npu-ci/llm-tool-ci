@@ -12,7 +12,7 @@ jobs:
   run_tests:
     runs-on: ascend-910b
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
@@ -20,9 +20,6 @@ jobs:
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub/:/opt/big_models/
         - /data/disk3/action/nlp_data/:/opt/nlp_data/
-        - /data/disk3/action/envs/fschat/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/
-        - /data/disk3/action/projects/FastChat:/__w/llm-tool-ci/llm-tool-ci/FastChat
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
@@ -30,14 +27,20 @@ jobs:
                --device /dev/davinci6
                --device /dev/davinci7
     steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+          with:
+            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+            path: llm-tool-ci
+            clean: false
         - name: Copy_Test_Cases
           working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           run: |
-            cp fastchat_test/cases/fine_tune/* /__w/llm-tool-ci/llm-tool-ci/FastChat/tests/
+            cp fastchat_test/cases/fine_tune/* /root/FastChat/tests/
 
         - name: run_fine_tune_cases
           timeout-minutes: 60
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/FastChat
+          working-directory: /root/FastChat
           run: |
             python tests/test_fine_tune.py > fine_tune.log
             sleep 1000

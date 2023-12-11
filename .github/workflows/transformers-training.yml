@@ -1,9 +1,9 @@
-name: Transformers NPU Training
-run-name: Transformers NPU Training
+name: Transformers Training
+run-name: Transformers Training
 
 on:
   workflow_run:
-    workflows: [Transformers NPU Inference]
+    workflows: [Transformers Inference]
     types:
       - completed
 
@@ -17,15 +17,13 @@ jobs:
       matrix:
         machine_type: [single-npu, multi-npu]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/models:/root/models
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
       options: --network host
               --device /dev/davinci_manager
               --device /dev/devmm_svm
@@ -33,8 +31,9 @@ jobs:
               --device /dev/davinci6
               ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci7' || ''}}
     steps:
-      - name: Trainer Verification (Single-NPU)
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/transformers
+      - 
+        name: Trainer Verification (Single-NPU)
+        working-directory: /root/transformers
         if: matrix.machine_type == 'single-npu' 
         run: | 
           python << EOF
@@ -43,8 +42,9 @@ jobs:
               trainer = test_trainer.get_regression_trainer(learning_rate=0.1)
               trainer.train()
           EOF
-      - name: Trainer Verification (Nulti-NPU)
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/transformers
+      - 
+        name: Trainer Verification (Multi-NPU)
+        working-directory: /root/transformers
         if: matrix.machine_type == 'multi-npu' 
         run: | 
           pytest tests/trainer/test_trainer_distributed.py::TestTrainerDistributedNPU

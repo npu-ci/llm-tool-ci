@@ -1,9 +1,9 @@
-name: Transformers NPU Inference
-run-name: Transformers NPU Inference
+name: Transformers Inference
+run-name: Transformers Inference
 
 on:
   workflow_run:
-    workflows: [Transformers NPU Build]
+    workflows: [Transformers Check Environment]
     types:
       - completed
 
@@ -17,15 +17,13 @@ jobs:
       matrix:
         machine_type: [single-npu, multi-npu]
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
         - /data/disk3/action/models:/root/models
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
       options: --network host
               --device /dev/davinci_manager
               --device /dev/devmm_svm
@@ -33,7 +31,8 @@ jobs:
               --device /dev/davinci6
               ${{ matrix.machine_type == 'multi-npu' && '--device /dev/davinci7' || ''}}
     steps:
-      - name: Pipeline Verification
+      - 
+        name: Pipeline Verification
         run: |
           python << EOF
           if __name__ == '__main__':

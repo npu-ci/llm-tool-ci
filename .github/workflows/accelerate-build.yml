@@ -2,7 +2,6 @@ name: Accelerate NPU Build
 run-name: Accelerate NPU Build
 
 on: 
-  push:
   schedule:
     - cron: '30 0 * * *' 
 
