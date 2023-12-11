@@ -1,10 +1,26 @@
-name: Transformers Docker Image
-run-name: Transformers Docker Image
+name: Build Docker Images
+run-name: Build Docker Images
 
-on: push
-
+on:
+  schedule:
+     - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
 jobs:
-  check_runner:
+  check-runner:
     runs-on: ascend-910b
     steps:
       - name: Check Runner Status
@@ -12,7 +28,7 @@ jobs:
 
   transformers-docker:
     runs-on: ascend-910b
-    needs: check_runner
+    needs: check-runner
     steps:
       -
         name: Get Latest Code
@@ -21,11 +37,31 @@ jobs:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
           path: llm-tool-ci
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        name: Build Docker Image
+        run: |
+          cd llm-tool-ci/docker/transformers
+          docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest -f ./Dockerfile .
+      -
+        name: Push Docker Image
+        run: |
+          docker push zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
+
+  fschat-docker:
+    runs-on: ascend-910b
+    needs: check-runner
+    steps:
+      -
+        name: Get Latest Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: llm-tool-ci
       -
         name: Login to DockerHub
         uses: docker/login-action@v3
@@ -33,11 +69,37 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v5
+        name: Build Docker Image
+        run: |
+          cd llm-tool-ci/docker/fschat
+          docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest -f ./Dockerfile .
+      -
+        name: Push Docker Image
+        run: |
+          docker push zhangsibo1129/ubuntu-cann-torch21-py39-fschat:latest
+
+  peft-docker:
+    runs-on: ascend-910b
+    needs: check-runner
+    steps:
+      - 
+        name: Get Latest Code
+        uses: actions/checkout@v4
         with:
-          context: ./docker/transformers
-          build-args: |
-            REF=main
-          push: true
-          tags: zhangsibo1129/ubuntu-cann-torch21-py39-transformers:latest
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: llm-tool-ci
+      - 
+        name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - 
+        name: Build Docker Image
+        run: |
+          cd llm-tool-ci/docker/peft
+          docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest -f ./Dockerfile .
+      - 
+        name: Push Docker Image
+        run: |
+          docker push zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest

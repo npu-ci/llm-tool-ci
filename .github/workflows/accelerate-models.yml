@@ -68,7 +68,6 @@ jobs:
         with:
           file_path: "/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/accelerate_test/accelerate-model-test-map.json"
           prop_path: ${{ matrix.model_type }}
-
       - name: Scan Model
         id: scan_model
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci

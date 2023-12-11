@@ -2,25 +2,21 @@ name: PEFT Official Tests
 run-name: PEFT Official Tests
 
 on:
-  workflow_run:
-    workflows: [PEFT NPU Build]
-    types:
-      - completed
+   schedule:
+     - cron: '0 1 * * *'
 
 jobs:
   run_tests:
     runs-on: ascend-910b
     container:
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
         - /data/disk3/action/models/hub/:/opt/big_models/
-        - /data/disk3/action/envs/peft/torch_npu:/root/miniconda/envs/torch_npu
-        - /data/disk3/action/repo:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/projects/peft:/__w/llm-tool-ci/llm-tool-ci/peft
+        - /data/disk3/action/nlp_data/:/opt/nlp_data/
       options: --network host
                --device /dev/davinci_manager
                --device /dev/devmm_svm
@@ -28,14 +24,41 @@ jobs:
                --device /dev/davinci6
                --device /dev/davinci7
     steps:
-        - name: Copy_Test_Cases
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
+        - name: Import Verification
+          working-directory: /root/peft
           run: |
-            cp peft_test/cases/official_tests/peft_npu_test.patch /__w/llm-tool-ci/llm-tool-ci/peft/
-
+            python << EOF
+            if __name__ == '__main__':
+                from peft import (
+                    AutoPeftModel,
+                    AutoPeftModelForCausalLM,
+                    AutoPeftModelForFeatureExtraction,
+                    AutoPeftModelForQuestionAnswering,
+                    AutoPeftModelForSeq2SeqLM,
+                    AutoPeftModelForSequenceClassification,
+                    AutoPeftModelForTokenClassification,
+                    PeftModel,
+                    PeftModelForCausalLM,
+                    PeftModelForFeatureExtraction,
+                    PeftModelForQuestionAnswering,
+                    PeftModelForSeq2SeqLM,
+                    PeftModelForSequenceClassification,
+                    PeftModelForTokenClassification,
+              )
+            EOF
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+          with:
+            ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+            path: llm-tool-ci
+            clean: false
+        - name: Copy_Test_Cases
+          working-directory: /root/llm-tool-ci
+          run: |
+            cp peft_test/cases/official_tests/peft_npu_test.patch /root/peft/
         - name: run_official_cases
           timeout-minutes: 20
-          working-directory: /__w/llm-tool-ci/llm-tool-ci/peft
+          working-directory: /root/peft
           run: |
             git apply -3 --whitespace=fix peft_npu_test.patch
             make test
