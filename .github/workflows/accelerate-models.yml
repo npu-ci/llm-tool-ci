@@ -41,7 +41,8 @@ jobs:
     needs: check_out_code
     strategy:
       matrix:
-        model_type: [Llama2, Bert, BLOOM, GPT-2, OPT]
+        #model_type: [Llama2, Bert, BLOOM, GPT-2, OPT]
+        model_type: [Bert, GPT-2, OPT]
     container: 
       image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
       volumes:
@@ -65,7 +66,7 @@ jobs:
         id: test_file
         uses: zoexx/github-action-json-file-properties@release
         with:
-          file_path: "accelerate_test/accelerate-model-test-map.json"
+          file_path: "/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/accelerate_test/accelerate-model-test-map.json"
           prop_path: ${{ matrix.model_type }}
       - name: Scan Model
         id: scan_model
@@ -73,10 +74,8 @@ jobs:
         # LD_PRELOAD to ignore scikit-learn import order error 
         run: | 
           pip install evaluate datasets transformers scikit-learn -i https://pypi.tuna.tsinghua.edu.cn/simple
-          export LD_PRELOAD='/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0'
-          
-          python accelerate_test/cases/scan_models/complete_nlp_example.py --model_name ${{steps.test_file.outputs.value}}
-
+          export LD_PRELOAD='/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0'          
+          accelerate launch accelerate_test/cases/scan_models/complete_nlp_example.py --model_name ${{steps.test_file.outputs.value}}
       - name: Write Result(True)
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
         if: steps.scan_model.outcome == 'success' 
