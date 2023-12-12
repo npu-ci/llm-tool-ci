@@ -1,6 +1,6 @@
 import sys
 import json
-
+import traceback
 import torch
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
@@ -18,7 +18,18 @@ from transformers import (
     OPTConfig,
     OPTForSequenceClassification,
     GPT2Config,
-    GPT2ForSequenceClassification
+    GPT2ForSequenceClassification,
+    GPTJConfig,
+    GPTJForSequenceClassification,
+    GPTNeoConfig,
+    GPTNeoForSequenceClassification,
+    GPTNeoXConfig,
+    GPTNeoXForSequenceClassification,
+    MistralConfig,
+    MistralForSequenceClassification,
+    LlamaConfig,
+    LlamaForSequenceClassification,
+    FuyuForCausalLM
 )
 from tqdm import tqdm
 
@@ -34,9 +45,18 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
         padding_side = "right"
     if "opt-" in model_name_or_path:
         config = OPTConfig()
-
     elif "gpt2" in model_name_or_path:
         config = GPT2Config()
+    elif "gpt-j" in model_name_or_path:
+        config = GPTJConfig()
+    elif "gpt-neo" in model_name_or_path:
+        config = GPTNeoConfig()
+    elif "gpt-neox" in model_name_or_path:
+        config = GPTNeoXConfig()
+    elif "mistral" in model_name_or_path:
+        config = MistralConfig()
+    elif "Llama" in model_name_or_path:
+        config = LlamaConfig()
     else:
         config = None
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, padding_side=padding_side)
@@ -48,8 +68,7 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
 
     def tokenize_function(examples):
         # max_length=None => use the model max length (it's actually the default)
-        outputs = tokenizer(examples["sentence1"], examples["sentence2"], truncation=True, max_length=None)
-        return outputs
+        return tokenizer(examples["sentence1"], examples["sentence2"], truncation=True, max_length=None)
 
     tokenized_datasets = datasets.map(
         tokenize_function,
@@ -76,6 +95,23 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
     elif "gpt2" in model_name_or_path:
         model = GPT2ForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
         model.config.pad_token_id = model.config.eos_token_id
+    elif "gpt-j" in model_name_or_path:
+        model = GPTJForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model.config.pad_token_id = model.config.eos_token_id
+    elif "gpt-neo" in model_name_or_path:
+        model = GPTNeoForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model.config.pad_token_id = model.config.eos_token_id
+    elif "gpt-neox" in model_name_or_path:
+        model = GPTNeoXForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model.config.pad_token_id = model.config.eos_token_id
+    elif "mistral" in model_name_or_path:
+        model = MistralForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model.config.pad_token_id = model.config.eos_token_id
+    elif "Llama" in model_name_or_path:
+        model = LlamaForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model.config.pad_token_id = model.config.eos_token_id
+    elif "fuyu" in model_name_or_path:
+        model = FuyuForCausalLM.from_pretrained(model_name_or_path, return_dict=True)
     else:
         model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True)
     model = get_peft_model(model, peft_config)
@@ -131,7 +167,7 @@ if __name__ == '__main__':
 
         result_ = {}
         for key, model_ in model_dict.items():
-            print("----------------" * 10)
+            print("---------------" * 10)
             print(model_)
             try:
                 acc = main(model_, dataset_, task_, device_, evaluate_path).get("accuracy") * 100
@@ -142,7 +178,7 @@ if __name__ == '__main__':
                     result_[key] = True
             except Exception as e:
                 print("%s get an error:" % model_)
-                print(e)
+                traceback.print_exc()
                 result_[key] = False
 
         with open("peft-models.json", "w") as fp:
