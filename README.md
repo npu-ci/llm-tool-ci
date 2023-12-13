@@ -12,6 +12,11 @@
 | [BLOOM]() |<!--transformers-BLOOM--> |<!--accelerate-BLOOM--> |<!--peft-BLOOM-->✅|<!--fschat-BLOOM--> |
 | [GPT-2]() |<!--transformers-GPT-2--> |<!--accelerate-GPT-2--> |<!--peft-GPT-2-->✅|<!--fschat-GPT-2--> |
 | [OPT]() |<!--transformers-OPT--> |<!--accelerate-OPT--> |<!--peft-OPT-->✅|<!--fschat-OPT--> |
+| [GPT-NEO]() |<!--transformers-GPT-NEO--> |<!--accelerate-GPT-NEO--> |<!--peft-GPT-NEO-->|<!--fschat-GPT-NEO--> |
+| [GPT-J]() |<!--transformers-GPT-J--> |<!--accelerate-GPT-J--> |<!--peft-GPT-J-->|<!--fschat-GPT-J--> |
+| [FUYU]() |<!--transformers-FUYU--> |<!--accelerate-FUYU--> |<!--peft-FUYU-->|<!--fschat-FUYU--> |
+| [GPT-NEOX]() |<!--transformers-GPT-NEOX--> |<!--accelerate-GPT-NEOX--> |<!--peft-GPT-NEOX-->|<!--fschat-GPT-NEOX--> |
+| [Mistral]() |<!--transformers-Mistral--> |<!--accelerate-Mistral--> |<!--peft-Mistral-->|<!--fschat-Mistral--> |
 | Others |  |  |  |  |
 
 ##### 基础环境

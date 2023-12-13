@@ -20,8 +20,10 @@ finetune_cmd = (
     '--save_total_limit 200  --learning_rate 5e-5  --weight_decay 0.  '
     '--lr_scheduler_type "cosine"  --logging_steps 1  '
     '--fsdp "full_shard auto_wrap"  --model_max_length 1024  '
-    '--gradient_checkpointing True  --lazy_preprocess True'
+    '--lazy_preprocess True'
 )
+
+use_gradient_checkpointing = "  --gradient_checkpointing True"
 
 
 def test_multi_npu(f_c, i_c):
@@ -46,10 +48,16 @@ if __name__ == "__main__":
         for model_name, model_path in models.items():
             print(model_path)
             _fine_cmd = finetune_cmd % model_path
+            if "cpm-ant" in model_name:
+                _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'CpmAntSegmentPositionEmbedding'"
+                continue
             if "llama" in model_name or "Llama" in model_name:
-                _fine_cmd = _fine_cmd + "  --fsdp_transformer_layer_cls_to_wrap 'LlamaDecoderLayer'"
+                _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'LlamaDecoderLayer'"
             if "bert" in model_name:
-                _fine_cmd = _fine_cmd + "  --fsdp_transformer_layer_cls_to_wrap 'BertLayer'"
+                _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'BertLayer'"
+            if "fuyu" in model_name:
+                _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'PersimmonDecoderLayer'"
+            _fine_cmd += use_gradient_checkpointing
             try:
                 test_multi_npu(_fine_cmd, infer_cmd)
                 result_dict[model_name] = True

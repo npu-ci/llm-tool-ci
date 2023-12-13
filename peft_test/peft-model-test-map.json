@@ -1,7 +1,12 @@
 {
-    "Llama2": "/opt/big_models/Llama-2-7b-chat-hf",
     "Bert": "/opt/big_models/bert-base-cased",
     "BLOOM": "/opt/big_models/bloom-7b1",
     "GPT-2": "/opt/big_models/gpt2",
-    "OPT": "/opt/big_models/opt-1.3b"
+    "OPT": "/opt/big_models/opt-1.3b",
+    "Llama2": "/opt/big_models/Llama-2-3b-hf",
+    "Mistral": "/opt/big_models/tiny-mistral",
+    "GPT-NEO": "/opt/big_models/gpt-neo-125m",
+    "GPT-J": "/opt/big_models/tiny-gpt-j",
+    "FUYU": "/opt/big_models/tiny-fuyu",
+    "GPT-NEOX": "/opt/big_models/tiny-gpt-neox"
 }
