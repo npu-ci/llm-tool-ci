@@ -46,8 +46,8 @@ RUN pip install pip --no-cache-dir --upgrade -i ${PIP_SOURCE_URL} && \
     pip install wheel pyyaml typing_extensions expecttest -i ${PIP_SOURCE_URL}
 
 # Install CANN toolkit
-ENV CANN_TOOLKIT_FILE=Ascend-cann-toolkit_7.0.0.alpha002_linux-aarch64.run
-ENV CANN_TOOLKIT_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC702/Ascend-cann-toolkit_7.0.0.alpha002_linux-aarch64.run?response-content-type=application/octet-stream
+ENV CANN_TOOLKIT_FILE=Ascend-cann-toolkit_7.0.0.alpha003_linux-aarch64.run
+ENV CANN_TOOLKIT_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC703/Ascend-cann-toolkit_7.0.0.alpha003_linux-aarch64.run?response-content-type=application/octet-stream
 ENV LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:$LD_LIBRARY_PATH
 
 RUN wget -O ${CANN_TOOLKIT_FILE} ${CANN_TOOLKIT_URL} && \
@@ -65,8 +65,8 @@ ENV TOOLCHAIN_HOME=${ASCEND_TOOLKIT_HOME}/toolkit
 ENV ASCEND_HOME_PATH=${ASCEND_TOOLKIT_HOME}
 
 # Install CANNN Kernels
-ENV CANN_KERNELS_FILE=Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run
-ENV CANN_KERNELS_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC702/Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run?response-content-type=application/octet-stream
+ENV CANN_KERNELS_FILE=Ascend-cann-kernels-910b_7.0.0.alpha003_linux.run
+ENV CANN_KERNELS_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC703/Ascend-cann-kernels-910b_7.0.0.alpha003_linux.run?response-content-type=application/octet-stream
 
 RUN wget -O ${CANN_KERNELS_FILE} ${CANN_KERNELS_URL} && \
     chmod +x ${CANN_KERNELS_FILE} && \
@@ -83,10 +83,13 @@ RUN wget -O ${TORCH_FILE} ${TORCH_URL} && \
     rm -f ${TORCH_FILE}
 
 # Install Torch NPU
-RUN pip install torch-npu==2.1.0rc1 -i ${PIP_SOURCE_URL}
+ENV TORCH_NPU_FILE=torch_npu-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+ENV TORCH_NPU_URL=https://gitee.com/ascend/pytorch/releases/download/v5.0.0-pytorch2.1.0/torch_npu-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
 
-# avoid import torch_npu error
-ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+RUN wget -O ${TORCH_NPU_FILE} ${TORCH_NPU_URL} && \
+    chmod +x ${TORCH_NPU_FILE} && \
+    pip install ${TORCH_NPU_FILE} -i ${PIP_SOURCE_URL} && \
+    rm -f ${TORCH_NPU_FILE}
 
 # Install Rust
 ENV RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
@@ -100,6 +103,3 @@ RUN echo "[source.crates-io]\n"\
 "\n"\
 "[source.ustc]\n"\
 "registry = \"sparse+https://mirrors.ustc.edu.cn/crates.io-index/\"\n">/root/.cargo/config
-
-# avoid import torch_npu error (from Install Rust)
-ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
