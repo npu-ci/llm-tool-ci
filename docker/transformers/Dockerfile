@@ -17,4 +17,5 @@ ENV PIP_SOURCE_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 RUN cd transformers && \
     pip install --no-cache-dir -e ".[dev-torch]" -i ${PIP_SOURCE_URL}
 
-RUN pip uninstall -y scikit-learn
+# Avoid import error caused by scikit-learn
+ENV LD_PRELOAD=/root/miniconda/envs/torch_npu/lib/python.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
