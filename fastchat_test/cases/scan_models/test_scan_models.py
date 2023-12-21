@@ -7,7 +7,7 @@ from fastchat.utils import run_cmd
 
 infer_cmd = (
     f"python3 -m fastchat.serve.cli --model-path output_model --device npu "
-    f"--style programmatic --num-gpus 2 --max-gpu-memory 14Gib < test_cli_inputs.txt"
+    f"--style programmatic --num-gpus 2 --max-gpu-memory 14Gib < tests/test_cli_inputs.txt"
 )
 finetune_cmd = (
     'torchrun --nproc_per_node=2 --master_port=20001 fastchat/train/train.py  '
