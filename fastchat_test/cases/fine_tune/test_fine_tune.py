@@ -7,7 +7,8 @@ from fastchat.utils import run_cmd
 
 def test_single_npu_fine_tune(cmd):
     model_path = "/opt/big_models/bloom-560m"
-
+    print("test_single_npu_fine_tune: model_path:%s" % model_path)
+    print("------" * 10)
     ret = run_cmd(cmd % (1, model_path))
     if ret != 0:
         raise RuntimeError("test %s in single npu error." % model_path)
@@ -21,6 +22,8 @@ def test_multi_npu_fine_tune(cmd):
         "/opt/big_models/gpt2",
     ]
     for model_path in models:
+        print("test_multi_npu_fine_tune: model_path:%s" % model_path)
+        print("------" * 10)
         if "llama" in model_path:
             _cmd = cmd + '  --fsdp_transformer_layer_cls_to_wrap "LlamaDecoderLayer"'
         else:
