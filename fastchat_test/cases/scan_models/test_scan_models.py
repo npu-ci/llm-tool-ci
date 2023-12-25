@@ -1,8 +1,10 @@
 """
 Test command line interface for model inference.
 """
-import sys
 import json
+import sys
+import traceback
+
 from fastchat.utils import run_cmd
 
 infer_cmd = (
@@ -24,13 +26,20 @@ finetune_cmd = (
 )
 
 use_gradient_checkpointing = "  --gradient_checkpointing True"
+save_logfile = "> %s_finetune.log"
 
 
-def test_multi_npu(f_c, i_c):
+def test_multi_npu(m_name, f_c, i_c):
     # 训练
     ret = run_cmd(f_c)
     if ret != 0:
         raise RuntimeError("finetune %s error." % model_path)
+    with open("%s_finetune.log" % m_name, mode='r') as f:
+        line = f.readline()
+        while line:
+            if "'loss': 0.0," in line or "'loss': -":
+                raise ValueError("Got loss <=0.0, some errors caused by precision have occurred.")
+            line = f.readline()
     # 推理
     ret = run_cmd(i_c)
     if ret != 0:
@@ -58,11 +67,12 @@ if __name__ == "__main__":
             if "fuyu" in model_name:
                 _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'PersimmonDecoderLayer'"
             _fine_cmd += use_gradient_checkpointing
+            _fine_cmd += save_logfile % model_name
             try:
-                test_multi_npu(_fine_cmd, infer_cmd)
+                test_multi_npu(_fine_cmd, infer_cmd, model_name)
                 result_dict[model_name] = True
             except Exception as e:
-                print(e)
+                traceback.print_exc()
                 rst += 1
                 result_dict[model_name] = False
     result_path = "fastchat-models.json"
