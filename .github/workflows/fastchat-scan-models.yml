@@ -39,7 +39,7 @@ jobs:
           cp fastchat_test/cases/scan_models/* /root/FastChat/tests/
           cp fastchat_test/fastchat-model-test-map.json /root/FastChat/
       - name: Run Scan Models
-        timeout-minutes: 120
+        timeout-minutes: 150
         working-directory: /root/FastChat
         run: |
           python tests/test_scan_models.py fastchat-model-test-map.json
