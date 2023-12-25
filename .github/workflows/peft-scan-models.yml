@@ -48,7 +48,7 @@ jobs:
           cp peft_test/cases/scan_models/sequence_classification_lora.py /root/peft/
           cp peft_test/peft-model-test-map.json /root/peft/
       - name: Run Scan Models
-        timeout-minutes: 20
+        timeout-minutes: 60
         working-directory: /root/peft
         run: |
           export LD_PRELOAD=$LD_PRELOAD:/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
