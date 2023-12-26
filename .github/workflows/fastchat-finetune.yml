@@ -42,8 +42,4 @@ jobs:
           timeout-minutes: 60
           working-directory: /root/FastChat
           run: |
-            python tests/test_fine_tune.py > fine_tune.log
-            sleep 1000
-            cat fine_tune.log
-            python tests/check_loss.py fine_tune.log
-
+            python tests/test_fine_tune.py

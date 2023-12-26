@@ -53,7 +53,7 @@ jobs:
             path: llm-tool-ci
             clean: false
         - name: Copy_Test_Cases
-          working-directory: /root/llm-tool-ci
+          working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
           run: |
             cp peft_test/cases/official_tests/peft_npu_test.patch /root/peft/
         - name: run_official_cases
