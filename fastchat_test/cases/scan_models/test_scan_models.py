@@ -18,7 +18,7 @@ finetune_cmd = (
     '--fp16 True  --output_dir output_model  --num_train_epochs 1  '
     '--per_device_train_batch_size 8  --per_device_eval_batch_size 1  '
     '--gradient_accumulation_steps 1  --evaluation_strategy "no"  '
-    '--save_strategy "steps"  --save_steps 2000  '
+    '--save_strategy "steps"  --save_steps 500  '
     '--save_total_limit 200  --learning_rate 5e-5  --weight_decay 0.  '
     '--lr_scheduler_type "cosine"  --logging_steps 1  '
     '--fsdp "full_shard auto_wrap"  --model_max_length 1024  '
@@ -33,7 +33,7 @@ def test_multi_npu(m_name, f_c, i_c):
     # 训练
     ret = run_cmd(f_c)
     if ret != 0:
-        raise RuntimeError("finetune %s error." % model_path)
+        raise RuntimeError("finetune %s error." % m_name)
     with open("%s_finetune.log" % m_name, mode='r') as f:
         line = f.readline()
         while line:
@@ -43,7 +43,7 @@ def test_multi_npu(m_name, f_c, i_c):
     # 推理
     ret = run_cmd(i_c)
     if ret != 0:
-        raise RuntimeError("inference %s's finetune model error." % model_path)
+        raise RuntimeError("inference %s's finetune model error." % m_name)
     print("---" * 20)
 
 
@@ -69,10 +69,11 @@ if __name__ == "__main__":
             _fine_cmd += use_gradient_checkpointing
             _fine_cmd += save_logfile % model_name
             try:
-                test_multi_npu(_fine_cmd, infer_cmd, model_name)
+                test_multi_npu(model_name, _fine_cmd, infer_cmd)
                 result_dict[model_name] = True
             except Exception as e:
                 traceback.print_exc()
+                print("---" * 20)
                 rst += 1
                 result_dict[model_name] = False
     result_path = "fastchat-models.json"
