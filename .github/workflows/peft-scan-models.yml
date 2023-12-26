@@ -6,7 +6,8 @@ on:
     workflows: [PEFT Official Tests]
     types:
       - completed
-
+env:
+  HF_HOME: /root/models
 
 jobs:
   scan_models:

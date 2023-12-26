@@ -1,6 +1,6 @@
 {
     "Bert": "/opt/big_models/bert-base-uncased",
-    "BLOOM": "/opt/big_models/bloom-7b1",
+    "BLOOM": "/opt/big_models/bloom-560m",
     "GPT-2": "/opt/big_models/gpt2",
     "OPT": "/opt/big_models/opt-1.3b",
     "Llama2": "/opt/big_models/Llama-2-3b-hf",
