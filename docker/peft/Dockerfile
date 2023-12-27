@@ -16,4 +16,4 @@ RUN cd peft && \
 # avoid import error caused by scikit-learn
 ENV PYTHON_VERSION=3.9
 ENV CONDA_ENV_NAME=torch_npu
-ENV LD_PRELOAD=/root/miniconda/envs/${CONDA_ENV_NAME}/lib/python${PYTHON_VERSION}/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:$LD_PRELOAD
+ENV LD_PRELOAD=/root/miniconda/envs/${CONDA_ENV_NAME}/lib/python${PYTHON_VERSION}/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:${LD_PRELOAD}
