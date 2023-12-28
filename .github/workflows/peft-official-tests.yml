@@ -3,7 +3,7 @@ run-name: PEFT Official Tests
 
 on:
    schedule:
-     - cron: '0 1 * * *'
+     - cron: '0 17 * * *'
 
 jobs:
   run_tests:

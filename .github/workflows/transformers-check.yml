@@ -3,7 +3,7 @@ run-name: Transformers Check Environment
 
 on:
   schedule:
-     - cron: '0 1 * * *'
+     - cron: '0 15 * * *'
 
 jobs:
   check_runner:
