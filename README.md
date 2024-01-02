@@ -22,10 +22,10 @@
 ##### 基础环境
 
 - 固件与驱动版本：[1.0.RC3.alpha](https://www.hiascend.com/hardware/firmware-drivers/community?product=4&model=26&cann=7.0.0.alpha002&driver=1.0.RC3.alpha)
-- CANN 版本：[7.0.0.alpha002](https://www.hiascend.com/zh/developer/download/community/result?module=pt+tf+cann)
+- CANN 版本：[7.0.0.alpha003](https://www.hiascend.com/zh/developer/download/community/result?module=pt+tf+cann)
 - Python 版本：[3.9.18](https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html)
 - Torch 版本：[2.1.0](https://gitee.com/link?target=https%3A%2F%2Fdownload.pytorch.org%2Fwhl%2Fcpu%2Ftorch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl%23sha256%3Dde7d63c6ecece118684415a3dbd4805af4a4c1ee1490cccf7405d8c240a481b4)
-- Torch_NPU 版本：[2.1.0rc1](https://gitee.com/ascend/pytorch)
+- Torch_NPU 版本：[release v5.0.0-pytorch2.1.0](https://gitee.com/ascend/pytorch/releases)
 
 ##### 环境安装
 
@@ -48,16 +48,16 @@
     
     ```shell
     export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:$LD_LIBRARY_PATH
-    chmod +x Ascend-cann-toolkit_7.0.0.alpha002_linux-aarch64.run
-    ./Ascend-cann-toolkit_7.0.0.alpha002_linux-aarch64.run --install
+    chmod +x Ascend-cann-toolkit_${VERSION}_linux-aarch64.run
+    ./Ascend-cann-toolkit_${VERSION}_linux-aarch64.run --install
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
 
     [CANN Kernerls](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC702/Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run?response-content-type=application/octet-stream) 安装包下载
     
     ```shell
-    chmod +x Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run
-    ./Ascend-cann-kernels-910b_7.0.0.alpha002_linux.run --install
+    chmod +x Ascend-cann-kernels-${VERSION}_linux.run
+    ./Ascend-cann-kernels-${VERSION}_linux.run --install
     ```
 
 - 安装 Torch
@@ -65,13 +65,13 @@
     [Torch](https://download.pytorch.org/whl/cpu/torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl) 安装包下载
     
     ```shell
-    chmod +x torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
-    pip install torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl -i https://pypi.tuna.tsinghua.edu.cn/simple
+    chmod +x torch-${VERSION}-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+    pip install torch-${VERSION}-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl -i https://pypi.tuna.tsinghua.edu.cn/simple
     ```
 
 - 安装 Torch_npu
     ```shell
-    pip install torch-npu==2.1.0rc1 -i https://pypi.tuna.tsinghua.edu.cn/simple
+    pip install torch-npu==${VERSION} -i https://pypi.tuna.tsinghua.edu.cn/simple
 
     export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
     ```
