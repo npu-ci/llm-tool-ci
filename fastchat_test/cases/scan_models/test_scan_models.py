@@ -4,8 +4,14 @@ Test command line interface for model inference.
 import json
 import sys
 import traceback
+import logging
 
 from fastchat.utils import run_cmd
+
+FORMAT = '%(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger()
+logger.level = logging.INFO
 
 infer_cmd = (
     f"python3 -m fastchat.serve.cli --model-path output_model --device npu "
@@ -44,7 +50,7 @@ def test_multi_npu(m_name, f_c, i_c):
     ret = run_cmd(i_c)
     if ret != 0:
         raise RuntimeError("inference %s's finetune model error." % m_name)
-    print("---" * 20)
+    logger.info("---" * 20)
 
 
 if __name__ == "__main__":
@@ -55,16 +61,16 @@ if __name__ == "__main__":
     with open(json_file, 'r') as fp:
         models = json.load(fp)
         for model_name, model_path in models.items():
-            print(model_path)
+            logger.info(model_path)
             _fine_cmd = finetune_cmd % model_path
-            if "cpm-ant" in model_name:
+            if "cpm-ant" in model_path:
                 _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'CpmAntSegmentPositionEmbedding'"
                 continue
-            if "llama" in model_name or "Llama" in model_name:
+            if "llama" in model_path or "Llama" in model_name:
                 _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'LlamaDecoderLayer'"
-            if "bert" in model_name:
+            if "bert" in model_path:
                 _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'BertLayer'"
-            if "fuyu" in model_name:
+            if "fuyu" in model_path:
                 _fine_cmd += "  --fsdp_transformer_layer_cls_to_wrap 'PersimmonDecoderLayer'"
             _fine_cmd += use_gradient_checkpointing
             _fine_cmd += save_logfile % model_name
@@ -72,8 +78,8 @@ if __name__ == "__main__":
                 test_multi_npu(model_name, _fine_cmd, infer_cmd)
                 result_dict[model_name] = True
             except Exception as e:
-                traceback.print_exc()
-                print("---" * 20)
+                traceback.logger.info_exc()
+                logger.info("---" * 20)
                 rst += 1
                 result_dict[model_name] = False
     result_path = "fastchat-models.json"
@@ -81,4 +87,4 @@ if __name__ == "__main__":
         json.dump(result_dict, rfp)
 
     if rst != 0:
-        print("total %d model error" % rst)
+        logger.info("total %d model error" % rst)
