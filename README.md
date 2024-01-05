@@ -33,8 +33,8 @@
   export NPU_DRIVER_VERSION=910b-npu-driver_23.0.rc3_linux-aarch64
   export NPU_FIRMWARE_VERSION=910b-npu-firmware_6.4.0.4.220
   export PYTHON_VERSION=3.9.18
-  export CANN_TOOLKIT_VERSION=7.0.0.alpha003_linux-aarch64
-  export CANN_KERNELS_VERSION=910_7.0.0.alpha003
+  export CANN_TOOLKIT_VERSION=7.0.0_linux-aarch64
+  export CANN_KERNELS_VERSION=910b_7.0.0_linux
   export TORCH_VERSION=2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64
   export TORCH_NPU_VERSION=2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64
   ```
@@ -42,8 +42,8 @@
   [npu-driver](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Ascend%20HDK/Ascend%20HDK%2023.0.RC3/Ascend-hdk-910b-npu-driver_23.0.rc3_linux-aarch64.run)    
   [npu-firmware](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Ascend%20HDK/Ascend%20HDK%2023.0.RC3/Ascend-hdk-910b-npu-firmware_6.4.0.4.220.run)    
   [miniconda](https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh)    
-  [CANN Toolkit](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC703/Ascend-cann-toolkit_7.0.0.alpha003_linux-aarch64.run?response-content-type=application/octet-stream)    
-  [CANN Kernerls](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC703/Ascend-cann-kernels-910_7.0.0.alpha003_linux.run?response-content-type=application/octet-stream)    
+  [CANN Toolkit](https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%207.0.0/Ascend-cann-toolkit_7.0.0_linux-aarch64.run?response-content-type=application/octet-stream)    
+  [CANN Kernerls](Ascend-cann-kernels-910b_7.0.0_linux.run)    
   [Torch](https://download.pytorch.org/whl/cpu/torch-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl)
   [Torch_NPU](https://gitee.com/ascend/pytorch/releases/download/v5.0.0-pytorch2.1.0/torch_npu-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl)   
 - 
