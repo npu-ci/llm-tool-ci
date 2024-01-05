@@ -46,8 +46,8 @@ RUN pip install pip --no-cache-dir --upgrade -i ${PIP_SOURCE_URL} && \
     pip install wheel pyyaml typing_extensions expecttest -i ${PIP_SOURCE_URL}
 
 # Install CANN toolkit
-ENV CANN_TOOLKIT_FILE=Ascend-cann-toolkit_7.0.0.alpha003_linux-aarch64.run
-ENV CANN_TOOLKIT_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC703/Ascend-cann-toolkit_7.0.0.alpha003_linux-aarch64.run?response-content-type=application/octet-stream
+ENV CANN_TOOLKIT_FILE=Ascend-cann-toolkit_7.0.0_linux-aarch64.run
+ENV CANN_TOOLKIT_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%207.0.0/Ascend-cann-toolkit_7.0.0_linux-aarch64.run?response-content-type=application/octet-stream
 ENV LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:${LD_LIBRARY_PATH}
 
 RUN wget -O ${CANN_TOOLKIT_FILE} ${CANN_TOOLKIT_URL} && \
@@ -65,8 +65,8 @@ ENV TOOLCHAIN_HOME=${ASCEND_TOOLKIT_HOME}/toolkit
 ENV ASCEND_HOME_PATH=${ASCEND_TOOLKIT_HOME}
 
 # Install CANNN Kernels
-ENV CANN_KERNELS_FILE=Ascend-cann-kernels-910b_7.0.0.alpha003_linux.run
-ENV CANN_KERNELS_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/Milan-ASL/Milan-ASL%20V100R001C15SPC703/Ascend-cann-kernels-910b_7.0.0.alpha003_linux.run?response-content-type=application/octet-stream
+ENV CANN_KERNELS_FILE=Ascend-cann-kernels-910b_7.0.0_linux.run
+ENV CANN_KERNELS_URL=https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%207.0.0/Ascend-cann-kernels-910b_7.0.0_linux.run?response-content-type=application/octet-stream
 
 RUN wget -O ${CANN_KERNELS_FILE} ${CANN_KERNELS_URL} && \
     chmod +x ${CANN_KERNELS_FILE} && \
