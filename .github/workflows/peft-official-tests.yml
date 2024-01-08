@@ -60,6 +60,6 @@ jobs:
           timeout-minutes: 20
           working-directory: /root/peft
           run: |
+            git reset --hard
             git apply -3 --whitespace=fix peft_npu_test.patch
             make test
-            git reset --hard
