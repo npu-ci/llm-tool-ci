@@ -29,7 +29,7 @@ from transformers import (
     MistralForSequenceClassification,
     LlamaConfig,
     LlamaForSequenceClassification,
-    FuyuForCausalLM
+    FuyuForCausalLM,
 )
 from tqdm import tqdm
 
@@ -37,7 +37,9 @@ from tqdm import tqdm
 def main(model_name_or_path, dataset_path, task, device, evaluate_path):
     batch_size = 32
     num_epochs = 20
-    peft_config = LoraConfig(task_type="SEQ_CLS", inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1)
+    peft_config = LoraConfig(
+        task_type="SEQ_CLS", inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1
+    )
     lr = 3e-4
     if any(k in model_name_or_path for k in ("gpt", "opt", "bloom")):
         padding_side = "left"
@@ -59,7 +61,9 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
         config = LlamaConfig()
     else:
         config = None
-    tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, padding_side=padding_side)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name_or_path, padding_side=padding_side
+    )
     if getattr(tokenizer, "pad_token_id") is None or tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
@@ -68,7 +72,12 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
 
     def tokenize_function(examples):
         # max_length=None => use the model max length (it's actually the default)
-        return tokenizer(examples["sentence1"], examples["sentence2"], truncation=True, max_length=None)
+        return tokenizer(
+            examples["sentence1"],
+            examples["sentence2"],
+            truncation=True,
+            max_length=None,
+        )
 
     tokenized_datasets = datasets.map(
         tokenize_function,
@@ -84,36 +93,59 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
         return tokenizer.pad(examples, padding="longest", return_tensors="pt")
 
     # Instantiate dataloaders.
-    train_dataloader = DataLoader(tokenized_datasets["train"], shuffle=True, collate_fn=collate_fn,
-                                  batch_size=batch_size)
+    train_dataloader = DataLoader(
+        tokenized_datasets["train"],
+        shuffle=True,
+        collate_fn=collate_fn,
+        batch_size=batch_size,
+    )
     eval_dataloader = DataLoader(
-        tokenized_datasets["validation"], shuffle=False, collate_fn=collate_fn, batch_size=batch_size
+        tokenized_datasets["validation"],
+        shuffle=False,
+        collate_fn=collate_fn,
+        batch_size=batch_size,
     )
     if "opt-" in model_name_or_path:
-        model = OPTForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = OPTForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "gpt2" in model_name_or_path:
-        model = GPT2ForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = GPT2ForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "gpt-j" in model_name_or_path:
-        model = GPTJForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = GPTJForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "gpt-neo" in model_name_or_path:
-        model = GPTNeoForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = GPTNeoForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "gpt-neox" in model_name_or_path:
-        model = GPTNeoXForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = GPTNeoXForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "mistral" in model_name_or_path:
-        model = MistralForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = MistralForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "Llama" in model_name_or_path:
-        model = LlamaForSequenceClassification(config).from_pretrained(model_name_or_path, return_dict=True)
+        model = LlamaForSequenceClassification(config).from_pretrained(
+            model_name_or_path, return_dict=True
+        )
         model.config.pad_token_id = model.config.eos_token_id
     elif "fuyu" in model_name_or_path:
         model = FuyuForCausalLM.from_pretrained(model_name_or_path, return_dict=True)
     else:
-        model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            model_name_or_path, return_dict=True
+        )
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
     optimizer = AdamW(params=model.parameters(), lr=lr)
@@ -154,7 +186,7 @@ def main(model_name_or_path, dataset_path, task, device, evaluate_path):
         return eval_metric
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     dataset_ = "/opt/nlp_data/glue/glue.py"
     evaluate_path = "/__w/llm-tool-ci/llm-tool-ci/evaluate/metrics/glue/glue.py"
     task_ = "mrpc"
@@ -162,7 +194,7 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     json_file = args[0]
     result_dict = {}
-    with open(json_file, 'r') as fp:
+    with open(json_file, "r") as fp:
         model_dict = json.load(fp)
 
         result_ = {}
@@ -170,13 +202,18 @@ if __name__ == '__main__':
             print("---------------" * 10)
             print(model_)
             try:
-                acc = main(model_, dataset_, task_, device_, evaluate_path).get("accuracy") * 100
+                acc = (
+                    main(model_, dataset_, task_, device_, evaluate_path).get(
+                        "accuracy"
+                    )
+                    * 100
+                )
                 if acc < 50:
                     print("%s accuracy=%s%%<60%%" % (model_, str(acc)))
                     result_[key] = False
                 else:
                     result_[key] = True
-            except Exception as e:
+            except Exception:
                 print("%s get an error:" % model_)
                 traceback.print_exc()
                 result_[key] = False
