@@ -1,7 +1,6 @@
 """
 Test command line interface for model inference.
 """
-import argparse
 import os
 
 from fastchat.utils import run_cmd
@@ -15,7 +14,7 @@ def test_single_npu():
 
     for model_path in models:
         if "model_weights" in model_path and not os.path.exists(
-                os.path.expanduser(model_path)
+            os.path.expanduser(model_path)
         ):
             continue
         cmd = (
@@ -47,9 +46,7 @@ def test_multi_npu():
 
 
 def test_8bit():
-    models = [
-        "/opt/big_models/bloom-560m"
-    ]
+    models = ["/opt/big_models/bloom-560m"]
 
     for model_path in models:
         cmd = (

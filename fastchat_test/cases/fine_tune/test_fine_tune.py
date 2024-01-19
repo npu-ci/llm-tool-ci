@@ -37,17 +37,17 @@ def test_multi_npu_fine_tune(cmd):
 if __name__ == "__main__":
     rst = 0
     _cmd = (
-        'torchrun --nproc_per_node=%d --master_port=20001 fastchat/train/train.py  '
-        '--model_name_or_path  %s  '
-        '--data_path /opt/nlp_data/evol-instruct-chinese--1-subset.json  '
-        '--fp16 True  --output_dir output_model  --num_train_epochs 2  '
-        '--per_device_train_batch_size 8  --per_device_eval_batch_size 1  '
+        "torchrun --nproc_per_node=%d --master_port=20001 fastchat/train/train.py  "
+        "--model_name_or_path  %s  "
+        "--data_path /opt/nlp_data/evol-instruct-chinese--1-subset.json  "
+        "--fp16 True  --output_dir output_model  --num_train_epochs 2  "
+        "--per_device_train_batch_size 8  --per_device_eval_batch_size 1  "
         '--gradient_accumulation_steps 1  --evaluation_strategy "no"  '
         '--save_strategy "steps"  --save_steps 2000  '
-        '--save_total_limit 200  --learning_rate 5e-5  --weight_decay 0.  '
+        "--save_total_limit 200  --learning_rate 5e-5  --weight_decay 0.  "
         '--lr_scheduler_type "cosine"  --logging_steps 1  '
         '--fsdp "full_shard auto_wrap"  --model_max_length 1024  '
-        '--gradient_checkpointing True  --lazy_preprocess True'
+        "--gradient_checkpointing True  --lazy_preprocess True"
     )
     try:
         test_single_npu_fine_tune(_cmd)
