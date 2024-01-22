@@ -103,3 +103,29 @@ jobs:
         name: Push Docker Image
         run: |
           docker push zhangsibo1129/ubuntu-cann-torch21-py39-peft:latest
+    
+  accelerate-docker:
+    runs-on: ascend-910b
+    needs: check-runner
+    steps:
+      - 
+        name: Get Latest Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
+          path: llm-tool-ci
+      - 
+        name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - 
+        name: Build Docker Image
+        run: |
+          cd llm-tool-ci/docker/accelerate
+          docker build --no-cache -t zhangsibo1129/ubuntu-cann-torch21-py39-accelerate:latest -f ./Dockerfile .
+      - 
+        name: Push Docker Image
+        run: |
+          docker push zhangsibo1129/ubuntu-cann-torch21-py39-accelerate:latest
