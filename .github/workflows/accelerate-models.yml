@@ -2,6 +2,7 @@ name: Accelerate NPU Scan Models
 run-name: Accelerate NPU Scan Models
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [Accelerate NPU UnitTest]
     types:
@@ -9,49 +10,18 @@ on:
 
 env:
   HF_HOME: /root/models
+  MODEL_LIST: "Bert BLOOM GPT-2 OPT Llama2 Mistral GPT-NEO GPT-J FUYU GPT-NEOX"
 
 jobs:
-  check_out_code:
+  scan_code:
     runs-on: ascend-910b
     container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
+      image: zhangsibo1129/ubuntu-cann-torch21-py39-accelerate:latest
       volumes:
         - /usr/local/dcmi:/usr/local/dcmi
         - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
         - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
         - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/data:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
-      options: --network host
-
-    steps:
-      - name: Get Latest Code
-        uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.SECRET_SSH_KEY }}
-          path: llm-tool-ci
-
-      - name: Create Empty File
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
-        run: |
-          python file_tool.py -f ./accelerate.json --create
-
-  scan_models:
-    runs-on: ascend-910b
-    needs: check_out_code
-    strategy:
-      matrix:
-        #model_type: [Llama2, Bert, BLOOM, GPT-2, OPT]
-        model_type: [Bert, GPT-2, OPT]
-    container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
-      volumes:
-        - /usr/local/dcmi:/usr/local/dcmi
-        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
-        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
-        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/data:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
         - /data/disk3/action/nlp_data/glue:/root/datasets/glue
         - /data/disk3/action/models/hub/:/opt/big_models/
         - /data/disk3/action/metric:/root/metric
@@ -59,61 +29,34 @@ jobs:
               --device /dev/davinci_manager
               --device /dev/devmm_svm
               --device /dev/hisi_hdc
-              --device /dev/davinci1
-              --device /dev/davinci2
-    steps: 
-      - name: Get Test File
-        id: test_file
-        uses: zoexx/github-action-json-file-properties@release
-        with:
-          file_path: "/__w/llm-tool-ci/llm-tool-ci/llm-tool-ci/accelerate_test/accelerate-model-test-map.json"
-          prop_path: ${{ matrix.model_type }}
-      - name: Scan Model
-        id: scan_model
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
-        # LD_PRELOAD to ignore scikit-learn import order error 
-        run: | 
-          pip install evaluate datasets transformers scikit-learn -i https://pypi.tuna.tsinghua.edu.cn/simple
-          export LD_PRELOAD='/root/miniconda/envs/torch_npu/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0'          
-          accelerate launch accelerate_test/cases/scan_models/complete_nlp_example.py --model_name ${{steps.test_file.outputs.value}}
-      - name: Write Result(True)
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
-        if: steps.scan_model.outcome == 'success' 
-        run: |
-          python file_tool.py -f accelerate.json -a ${{ matrix.model_type }}:true
-      
-      - name: Write Result(False)
-        working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
-        if: steps.scan_model.outcome != 'success' 
-        run: |
-          python file_tool.py -f accelerate.json -a ${{ matrix.model_type }}:false
-
-  update_table:
-    runs-on: ascend-910b
-    needs: scan_models
-    container: 
-      image: zhangsibo1129/ubuntu-cann-torch21-py39:latest
-      volumes:
-        - /usr/local/dcmi:/usr/local/dcmi
-        - /usr/local/bin/npu-smi:/usr/local/bin/npu-smi
-        - /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64
-        - /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info
-        - /data/disk3/action/data:/__w/llm-tool-ci/llm-tool-ci
-        - /data/disk3/action/data/torch_npu:/root/miniconda/envs/torch_npu
-      options: --network host
-
+              --device /dev/davinci6
+              --device /dev/davinci7
+              
     steps:
-      - name: Checkout Code
+      - name: Get Latest Code
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SECRET_SSH_KEY }}
           path: llm-tool-ci
-          clean: false
 
-      - name: Write Table to README
+      - name: Scan Model
+        id: scan_model
+        continue-on-error: true
         working-directory: /__w/llm-tool-ci/llm-tool-ci/llm-tool-ci
-        run: |
-          python update_table.py -f README.md -t accelerate.json -n accelerate
+        run: | 
+          set +e
+          for model_name in ${MODEL_LIST}
+          do 
+              printf "### Start ${model_name} training ###\n" 
+              model_path=$(cat accelerate_test/accelerate-model-test-map.json | \
+                    grep ${model_name} | \
+                    awk -F ":" '{print $2}' | \
+                    tr -d '\", ')
+              accelerate launch accelerate_test/cases/scan_models/complete_nlp_example.py \
+                  --model_name $model_path
+              python update_table.py -f README.md -ti $model_name:$? -n accelerate
+              printf "### End ${model_name} training and update table ###\n"
+          done
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
